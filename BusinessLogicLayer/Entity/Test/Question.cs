@@ -1,33 +1,30 @@
-﻿namespace BusinessLogicLayer.Entity;
+﻿namespace BusinessLogicLayer.Entity.Test;
 
 [Serializable]
 public class Question
 {
+    #region Fields
     string value = "";
-    Answers _answers = new Answers();
+    Answers _answers = new();
+    #endregion
 
     #region Ctors
-    public Question(string question, Answers answers)
+    public Question()
     {
-        value = question;
-        _answers = answers;
+
     }
     public Question(string question)
     {
         value = question;
     }
-    public Question()
+    public Question(string question, Answers answers)
+        : this(question)
     {
-
+        _answers = answers;
     }
     #endregion
 
     #region Properties
-    public Answers Answers
-    {
-        get => _answers;
-        set => _answers = value;
-    }
     public string Value
     {
         get => value;
@@ -38,17 +35,22 @@ public class Question
         get => Answers[index];
         set => Answers[index] = value;
     }
-    public int RightAnswer
+
+    public Answers Answers
+    {
+        get => _answers;
+        set => _answers = value;
+    }
+    public int? RightAnswer
     {
         get => _answers.RightAnswer;
         set => _answers.RightAnswer = value;
     }
-    public int UserAnswer
+    public int? UserAnswer
     {
         get => _answers.UserAnswer;
         set => _answers.UserAnswer = value;
     }
-
     #endregion
 
     public void Add(string answer)
@@ -56,17 +58,13 @@ public class Question
         _answers.Add(answer);
     }
 
-    public override string ToString()
-    {
-        string res = value;
-        return res;
-    }
+    #region Object
+    public override string ToString() => value;
     public override bool Equals(object? obj) => Value.Equals((obj as Question).Value);
-
     public override int GetHashCode() => Value.GetHashCode();
+    #endregion
 
-
-
+    #region Cast
     public static implicit operator Question(string question)
     {
         return new Question(question);
@@ -75,4 +73,5 @@ public class Question
     {
         return question.Value;
     }
+    #endregion
 }

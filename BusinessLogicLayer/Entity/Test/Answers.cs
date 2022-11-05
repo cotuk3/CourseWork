@@ -1,16 +1,23 @@
 ﻿using System.Globalization;
+namespace BusinessLogicLayer.Entity.Test;
 
-namespace BusinessLogicLayer.Entity;
 [Serializable]
 public class Answers : List<string>, IFormattable
 {
+    #region Fields
     public const int maxCapacity = 4;
     public const string testFormat = "T";
     public const string answerFormat = "A";
     public const string defaultFormat = "D";
+    public const string compareFormat = "C";
+    #endregion
 
-    public int RightAnswer { get; set; } = -1;
-    public int UserAnswer { get; set; } = -1;
+    #region Properties
+    public int? RightAnswer { get; set; } = null;
+    public int? UserAnswer { get; set; } = null;
+    #endregion
+
+    #region IFormattable
     public override string ToString()
     {
         return ToString(testFormat, CultureInfo.CurrentCulture);
@@ -28,36 +35,34 @@ public class Answers : List<string>, IFormattable
 
         string res = "";
         int index = 1;
-        switch(format.ToUpperInvariant())
+        foreach(string answer in this)
         {
-            case answerFormat:
-            foreach(string answer in this)
+            res += $"\t{index}" + $") {answer};";
+            switch(format.ToUpperInvariant())
             {
-                res += $"\t{index}" + $") {answer};";
+                case answerFormat:
                 if(index - 1 == RightAnswer)
                     res += " +";
-                index++;
-            }
-            return res;
-            case testFormat:
-            foreach(string answer in this)
-            {
-                res += $"\t{index}" + $") {answer};";
+                break;
+                case testFormat:
+                if(index - 1 == UserAnswer)
+                    res += " <--";
+                break;
+                case compareFormat:
                 if(index - 1 == UserAnswer)
                     res += " <--";
 
-                index++;
-            }
-            return res;
-            case defaultFormat:
-            default:
-            foreach(string answer in this)
-            {
-                res += $"\t{index}" + $") {answer};";
-                index++;
-            }
-            return res;
-        }
-    }
+                if(index - 1 == RightAnswer)
+                    res += " +";
+                break;
+                case defaultFormat:
+                default:
+                break;
 
+            }
+            index++;
+        }
+        return res;
+    }
+    #endregion
 }

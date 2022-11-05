@@ -1,6 +1,7 @@
-﻿using System.Globalization;
+﻿using BusinessLogicLayer.Entity.Stats;
+using System.Globalization;
 
-namespace BusinessLogicLayer.Entity;
+namespace BusinessLogicLayer.Entity.Test;
 
 [Serializable]
 public class Test : IFormattable
@@ -50,9 +51,7 @@ public class Test : IFormattable
     }
     public string GetLastStatistic()
     {
-        string res = _statistic[_statistic.Count - 1];
-
-        return res;
+        return _statistic[^1];
     }
     public void ClearStatistic()
     {
@@ -66,9 +65,9 @@ public class Test : IFormattable
     {
         return Statistic.GetStatsByDate(time);
     }
-
     #endregion
 
+    #region Object
     public override string ToString()
     {
         return ToString("D", CultureInfo.CurrentCulture);
@@ -76,7 +75,7 @@ public class Test : IFormattable
     public override bool Equals(object? obj)
     {
         Test? test = obj as Test;
-        if(obj is not null)
+        if(test is not null)
         {
             if(Questions.Count == test.Questions.Count)
             {
@@ -88,15 +87,20 @@ public class Test : IFormattable
                 return true;
             }
         }
-
         return false;
-
     }
     public override int GetHashCode()
     {
-        return Questions.GetHashCode();
+        int res = 1;
+        foreach(var questioin in _questions)
+        {
+            res *= questioin.GetHashCode();
+        }
+        return res;
     }
+    #endregion
 
+    #region IFormattable
     public string ToString(string? format)
     {
         return ToString(format, CultureInfo.CurrentCulture);
@@ -109,30 +113,31 @@ public class Test : IFormattable
         formatProvider ??= CultureInfo.CurrentCulture;
 
         string res = "";
-        switch(format.ToUpperInvariant())
+        foreach(var question in _questions)
         {
-            case Answers.answerFormat:
-            foreach(Question question in _questions)
+            res += question.ToString();
+
+            switch(format.ToUpperInvariant())
             {
-                res += question.ToString();
+                case Answers.answerFormat:
                 res += "\n" + question.Answers.ToString(Answers.answerFormat) + "\n";
-            }
-            return res;
-            case Answers.testFormat:
-            foreach(Question question in _questions)
-            {
-                res += question.ToString();
+                break;
+
+                case Answers.testFormat:
                 res += "\n" + question.Answers.ToString(Answers.testFormat) + "\n";
-            }
-            return res;
-            case Answers.defaultFormat:
-            default:
-            foreach(Question question in _questions)
-            {
-                res += question.ToString();
+                break;
+
+                case Answers.compareFormat:
+                res += "\n" + question.Answers.ToString(Answers.compareFormat) + "\n";
+                break;
+
+                case Answers.defaultFormat:
+                default:
                 res += "\n" + question.Answers.ToString(Answers.defaultFormat) + "\n";
+                break;
             }
-            return res;
         }
+        return res;
     }
+    #endregion
 }
