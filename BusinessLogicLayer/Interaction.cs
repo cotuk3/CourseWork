@@ -12,10 +12,12 @@ public class Interaction
     string? _filePath;
     string? _fileExtension;
 
-    public readonly ArgumentException wrongFile = new ArgumentException("File or file extension is not valid!");
-    public readonly IndexOutOfRangeException wrongIndex = new IndexOutOfRangeException("Index out of range!");
+    public static readonly ArgumentException wrongFile = new("File or file extension is not valid!");
+    //public static readonly IndexOutOfRangeException wrongIndex = new("Index out of range!");
+    public static readonly QuestionException wrongQuestion = new();
+    public static readonly AnswerException wrongAnswer = new();
 
-    static readonly Dictionary<string, Func<string, object?>> deser = new()
+    static readonly Dictionary<string, Func<string?, object?>> deser = new()
     {
         { ".xml", (filePath) => new XMLProvider(typeof(Test), new Type[]
         {
@@ -25,7 +27,7 @@ public class Interaction
         { ".dat", (filePath) => new BinaryProvider(typeof(Test)).Deserialize(filePath) },
         { ".json", (filePath) => new JSONProvider(typeof(Test)).Deserialize(filePath) }
     };
-    static readonly Dictionary<string, Action<object, string>> ser = new()
+    static readonly Dictionary<string, Action<object, string?>> ser = new()
     {
         {".xml", (graph, filePath) => new XMLProvider(typeof(Test), new Type[]
         {
@@ -126,21 +128,13 @@ public class Interaction
     }
     #endregion
 
-    //left here 3:15 p.m Saturday
     #region Question 
     public void AddQuestion(Question question)
     {
         Test? test;
         if(File.Exists(_filePath))
         {
-            try
-            {
-                test = deser[_fileExtension](_filePath) as Test;
-            }
-            catch
-            {
-                throw;
-            }
+            test = deser[_fileExtension](_filePath) as Test;
 
             test ??= new();
         }
@@ -152,177 +146,127 @@ public class Interaction
     }
     public void DeleteQuestion(int index)
     {
-        try
+        var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
+
+        if(IsIndexValid(index, test.Questions))
         {
-            var test = GetTest();
-            if(test is not null)
-            {
-                if(IsIndexValid(index, test.Questions))
-                {
-                    test.RemoveAt(index);
-                    AddTest(test);
-                }
-                else
-                    throw wrongIndex;
-            }
-            else
-                throw wrongFile;
+            test.RemoveAt(index);
+            AddTest(test);
         }
-        catch
-        {
-            throw;
-        }
+        else
+            throw new QuestionException(index);
     }
     public void ChangeQuestion(int index, Question newQuestion)
     {
-        try
-        {
-            if(IsIndexValid(index, GetTest().Questions) && IsQuestionValid(newQuestion))
-            {
-                var test = GetTest();
-                test[index].Value = newQuestion;
-                ClearFile();
-                AddTest(test);
-            }
-            else if(!IsIndexValid(index, GetTest().Questions))
-                throw wrongIndex;
-            else if(!IsQuestionValid(newQuestion))
-                throw new QuestionException();
-        }
-        catch
-        {
-            throw;
-        }
-    }
-    public static Question CreateQuestion(string question)
-    {
-        if(IsQuestionValid(question))
-            return new Question(question);
+        var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
 
-        throw new QuestionException();
+        if(IsIndexValid(index, test.Questions) && IsQuestionValid(newQuestion))
+        {
+            test[index].Value = newQuestion;
+            AddTest(test);
+        }
+        else if(!IsIndexValid(index, test.Questions))
+            throw new QuestionException(index);
+        else if(!IsQuestionValid(newQuestion))
+            throw wrongQuestion;
     }
+    public static Question CreateQuestion(string question) => IsQuestionValid(question) ? new Question(question) : throw wrongQuestion;
     #endregion
 
     #region Answers
     public void AddAnswer(int questionIndex, string answer)
     {
-        var test = deser[_fileExtension](_filePath) as Test;
+        var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
+
         if(IsIndexValid(questionIndex, test.Questions))
-        {  
+        {
             Question question = test[questionIndex];
-            try
-            {
-                AddAnswer(ref question, answer);
-            }
-            catch
-            {
-                throw;
-            }
+
+            AddAnswer(ref question, answer);
+
             test[questionIndex] = question;
-            ClearFile();
             AddTest(test);
         }
         else
-            throw wrongIndex;
+            throw new QuestionException(questionIndex);
     }
     public void DeleteAnswer(int questionIndex, int answerIndex)
     {
-        var test = deser[_fileExtension](_filePath) as Test;
+        var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
+
         if(IsIndexValid(questionIndex, test.Questions))
         {
             Question question = test[questionIndex];
-            try
-            {
-                DeleteAnswer(ref question, answerIndex);
-            }
-            catch
-            {
-                throw;
-            }
+
+            DeleteAnswer(ref question, answerIndex);
+
             test[questionIndex] = question;
-            ClearFile();
             AddTest(test);
         }
         else
-            throw wrongIndex;
+            throw new QuestionException(questionIndex);
     }
     public void SetRightAnswer(int questionIndex, int answerIndex)
     {
-        if(IsIndexValid(questionIndex, GetTest().Questions))
+        var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
+
+        if(IsIndexValid(questionIndex, test.Questions))
         {
-            var test = GetTest();
             Question question = test[questionIndex];
-            try
-            {
-                SetRightAnswer(ref question, answerIndex);
-            }
-            catch
-            {
-                throw;
-            }
+
+            SetRightAnswer(ref question, answerIndex);
+
             test[questionIndex] = question;
-            ClearFile();
+
             AddTest(test);
         }
         else
-            throw wrongIndex;
+            throw new QuestionException(questionIndex);
     }
     public void ChangeAnswer(int questionIndex, int answerIndex, string answer)
     {
-        if(IsIndexValid(questionIndex, GetTest().Questions))
-        {
-            var test = deser[_fileExtension](_filePath) as Test;
+        var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
+
+        if(IsIndexValid(questionIndex, test.Questions))
+        {   
             Question question = test[questionIndex];
-            try
-            {
-                ChangeAnswer(ref question, answerIndex, answer);
-            }
-            catch
-            {
-                throw;
-            }
+
+            ChangeAnswer(ref question, answerIndex, answer);
             test[questionIndex] = question;
-            ClearFile();
+
             AddTest(test);
         }
         else
-            throw wrongIndex;
+            throw new QuestionException(questionIndex);
     }
 
-    void AddAnswer(ref Question question, string answer)
+    static void AddAnswer(ref Question question, string answer)
     {
         if(question.Answers.Count < Answers.maxCapacity)
-        {
             question.Add(answer);
-        }
         else
-            throw new AnswerException();
+            throw wrongAnswer;
     }
-    void DeleteAnswer(ref Question question, int index)
+    static void DeleteAnswer(ref Question question, int index)
     {
         if(IsIndexValid(index, question.Answers))
-        {
             question.Answers.RemoveAt(index);
-        }
         else
-            throw wrongIndex;
-
+            throw wrongAnswer;
     }
-    void SetRightAnswer(ref Question question, int index)
+    static void SetRightAnswer(ref Question question, int index)
     {
         if(IsIndexValid(index, question.Answers))
-        {
             question.Answers.RightAnswer = index;
-        }
         else
-            throw wrongIndex;
+            throw wrongAnswer;
     }
-    void ChangeAnswer(ref Question question, int index, string answer)
+    static void ChangeAnswer(ref Question question, int index, string answer)
     {
         if(IsIndexValid(index, question.Answers))
-        {
             question.Answers[index] = answer;
-        }
+        else
+            throw wrongAnswer;
     }
     #endregion
 
@@ -341,23 +285,22 @@ public class Interaction
         return new User(firstName, lastName);
     }
 
-    public double GetPersentOfRightAnswers(Test test, DateTime time, User user)
+    public void GetPersentOfRightAnswers(Test test, DateTime time, User user)
     {
         int count = 0;
+
         foreach(Question question in test.Questions)
         {
             if(question.RightAnswer == question.UserAnswer)
-            {
                 count++;
-            }
-            question.UserAnswer = -1;
         }
-        double value = (double)((double)count / test.Count) * 100.0;
-        Mark mark = new(value, time);
-        test.AddStatistic(user, mark);
-        ClearFile();
-        AddTest(test);
 
-        return value;
+        double value = ((double)count / test.Count) * 100.0;
+
+        Mark mark = new(value, time);
+
+        test.AddStatistic(user, mark);
+
+        AddTest(test);
     }
 }
