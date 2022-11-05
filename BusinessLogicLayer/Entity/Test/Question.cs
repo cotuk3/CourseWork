@@ -53,10 +53,16 @@ public class Question
     }
     #endregion
 
+    #region Methods
     public void Add(string answer)
     {
         _answers.Add(answer);
     }
+    public void Reset()
+    {
+        _answers.UserAnswer = -1;
+    }
+    #endregion
 
     #region Object
     public override string ToString() => value;

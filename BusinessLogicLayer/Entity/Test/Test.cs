@@ -36,6 +36,12 @@ public class Test : IFormattable
         get => _questions;
         set => _questions = value;
     }
+
+    public void Reset()
+    {
+        foreach(var question in _questions)
+            question.Reset();
+    }
     #endregion
 
     #region Statistic
