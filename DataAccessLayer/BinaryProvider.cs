@@ -23,8 +23,15 @@ public class BinaryProvider : DataProvider
         using(FileStream fileStream = File.OpenRead(filePath))
         {
             BinaryFormatter bf = new();
-            graph = bf.Deserialize(fileStream);
-            return graph;
+            try
+            {
+                graph = bf.Deserialize(fileStream);
+                return graph;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }

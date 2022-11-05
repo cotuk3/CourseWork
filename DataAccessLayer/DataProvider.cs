@@ -1,13 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace DataAccess;
+﻿namespace DataAccess;
 public abstract class DataProvider
 {
-    protected Type _type;
+	protected Type _type;
 
 	public DataProvider(Type type)
 	{

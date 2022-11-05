@@ -3,24 +3,21 @@ namespace DataAccess;
 public class XMLProvider : DataProvider
 {
     readonly Type[]? _param;
-	public XMLProvider(Type type)
-        :base(type)
-	{
-	}
+    public XMLProvider(Type type)
+        : base(type)
+    {
+    }
     public XMLProvider(Type type, Type[] param)
-        :base(type)
+        : base(type)
     {
         _param = param;
     }
-	public override void Serialize(object graph, string filePath)
-	{
+    public override void Serialize(object graph, string filePath)
+    {
         using(FileStream fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write))
         {
             XmlSerializer xs;
-            if(_param is not null)
-                xs = new XmlSerializer(_type, _param);
-            else
-                xs = new XmlSerializer(_type);
+            xs = _param is null ? new XmlSerializer(_type) : new XmlSerializer(_type, _param);
             xs.Serialize(fileStream, graph);
         }
     }
@@ -31,13 +28,17 @@ public class XMLProvider : DataProvider
         using(FileStream fileStream = File.OpenRead(filePath))
         {
             XmlSerializer xs;
-            if(_param is not null)
-                xs = new XmlSerializer(_type, _param);
-            else
-                xs = new XmlSerializer(_type);
+            try
+            {
+                xs = _param is null ? new XmlSerializer(_type) : new XmlSerializer(_type, _param);
 
-            graph = xs.Deserialize(fileStream);
-            return graph;
+                graph = xs.Deserialize(fileStream);
+                return graph;
+            }
+            catch
+            {
+                return null;
+            }
         }
     }
 }
