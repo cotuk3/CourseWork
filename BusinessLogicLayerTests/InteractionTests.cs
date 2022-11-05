@@ -65,7 +65,7 @@ public class InteractionTests
         bool expected = true;
 
         //act
-        var question = inter.CreateQuestion("How old are 123 you?");
+        var question = Interaction.CreateQuestion("How old are 123 you?");
         bool actual = Interaction.IsQuestionValid(question);
 
         //assert
@@ -305,7 +305,7 @@ public class InteractionTests
 
         //act
         inter = new("file.xml");
-        var actualQ = inter.CreateQuestion(question);
+        var actualQ = Interaction.CreateQuestion(question);
         inter.AddQuestion("How are you?");
         inter.AddAnswer(0, "D");
         var actual = inter.GetTest();
@@ -327,7 +327,7 @@ public class InteractionTests
         //act
         inter = new("file.xml");
         inter.ClearFile();
-        var actualQ = inter.CreateQuestion(question);
+        var actualQ = Interaction.CreateQuestion(question);
         inter.AddQuestion(question);
         inter.AddAnswer(0, "D");
         inter.AddAnswer(0, "E");
@@ -364,7 +364,7 @@ public class InteractionTests
         //act
         inter = new("file.xml");
         inter.ClearFile();
-        var actualQ = inter.CreateQuestion(question);
+        var actualQ = Interaction.CreateQuestion(question);
         inter.AddQuestion("How are you?");
         inter.AddAnswer(0, "A");
         inter.AddAnswer(0, "B");
@@ -384,7 +384,7 @@ public class InteractionTests
         Question expected = new Question("How are you?");
 
         //act
-        var actual = inter.CreateQuestion("How are you?");
+        var actual = Interaction.CreateQuestion("How are you?");
 
         //assert
         Assert.AreEqual(expected, actual, actual.ToString());
@@ -400,7 +400,7 @@ public class InteractionTests
     public void CreateQuestion_Fail(string question)
     {
         //act
-        var actual = inter.CreateQuestion(question);
+        var actual = Interaction.CreateQuestion(question);
     }
     #endregion
 
@@ -458,7 +458,7 @@ public class InteractionTests
         //act
         inter = new("file.xml");
         inter.ClearFile();
-        var actualQ = inter.CreateQuestion(question);
+        var actualQ = Interaction.CreateQuestion(question);
         inter.AddQuestion("How are you?");
         inter.AddAnswer(0, "D");
         inter.ChangeAnswer(0, 0, "A");
