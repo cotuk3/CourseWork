@@ -13,6 +13,11 @@ public class QuestionException : Exception
     {
     }
 
+    public QuestionException(int? index)
+        : base($"Index: {index} is not valid for test!")
+    {
+    }
+
     public QuestionException(string? message, Exception? innerException)
         : base(message, innerException)
     {
