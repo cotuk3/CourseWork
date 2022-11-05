@@ -8,15 +8,18 @@ public class QuestionException : Exception
         : base("Question is not valid!")
     {
     }
-    public QuestionException(string? message) : base(message)
+    public QuestionException(string? message)
+        : base(message)
     {
     }
 
-    public QuestionException(string? message, Exception? innerException) : base(message, innerException)
+    public QuestionException(string? message, Exception? innerException)
+        : base(message, innerException)
     {
     }
 
-    protected QuestionException(SerializationInfo info, StreamingContext context) : base(info, context)
+    protected QuestionException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
     {
     }
 }

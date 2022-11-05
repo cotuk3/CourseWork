@@ -5,10 +5,11 @@ namespace BusinessLogicLayer.Exceptions;
 public class UserException : Exception
 {
     public UserException()
+        : base()
     {
     }
 
-    public UserException(string? message) 
+    public UserException(string? message)
         : base($"{message} was in wrong format")
     {
     }
@@ -17,11 +18,13 @@ public class UserException : Exception
     {
     }
 
-    public UserException(string? message, Exception? innerException) : base(message, innerException)
+    public UserException(string? message, Exception? innerException)
+        : base(message, innerException)
     {
     }
 
-    protected UserException(SerializationInfo info, StreamingContext context) : base(info, context)
+    protected UserException(SerializationInfo info, StreamingContext context)
+        : base(info, context)
     {
     }
 }
