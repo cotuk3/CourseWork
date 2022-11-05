@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.Json;
-using System.Threading.Tasks;
-
+﻿using System.Text.Json;
 namespace DataAccess;
 public class JSONProvider : DataProvider
 {
@@ -13,7 +7,6 @@ public class JSONProvider : DataProvider
     {
 
     }
-
     public override void Serialize(object graph, string filePath)
     {
         using(FileStream fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write))
@@ -21,16 +14,15 @@ public class JSONProvider : DataProvider
             JsonSerializer.Serialize(fileStream, graph, _type);
         }
     }
-
-    public override object Deserialize(string filePath)
+    public override object? Deserialize(string filePath)
     {
-        object obj;
+        object? graph;
         using(var fileStream = File.OpenRead(filePath))
         {
             try
             {
-                obj = JsonSerializer.Deserialize(fileStream, _type);
-                return obj;
+                graph = JsonSerializer.Deserialize(fileStream, _type);
+                return graph;
             }
             catch
             {
