@@ -35,6 +35,10 @@ public class XMLProvider : DataProvider
                 graph = xs.Deserialize(fileStream);
                 return graph;
             }
+            catch(FileNotFoundException)
+            {
+                throw;
+            }
             catch
             {
                 return null;

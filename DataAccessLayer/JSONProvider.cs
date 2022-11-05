@@ -24,6 +24,10 @@ public class JSONProvider : DataProvider
                 graph = JsonSerializer.Deserialize(fileStream, _type);
                 return graph;
             }
+            catch(FileNotFoundException)
+            {
+                throw;
+            }
             catch
             {
                 return null;

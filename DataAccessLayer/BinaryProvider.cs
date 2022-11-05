@@ -28,6 +28,10 @@ public class BinaryProvider : DataProvider
                 graph = bf.Deserialize(fileStream);
                 return graph;
             }
+            catch(FileNotFoundException)
+            {
+                throw;
+            }
             catch
             {
                 return null;
