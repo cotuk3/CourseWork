@@ -1,4 +1,4 @@
-﻿using BusinessLogicLayer.Entity;
+﻿using BusinessLogicLayer.Entity.Test;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 
 namespace DataAccess.Tests;

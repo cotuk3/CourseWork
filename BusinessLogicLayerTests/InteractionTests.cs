@@ -1,4 +1,4 @@
-﻿using BusinessLogicLayer.Entity;
+﻿using BusinessLogicLayer.Entity.Test;
 using BusinessLogicLayer.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
@@ -11,16 +11,39 @@ public class InteractionTests
     #region Fields
     static Interaction inter = new();
 
-    static Answers answers = new() { "A", "B", "C" };
-    static Answers answers1 = new() { "1", "0", "-10" };
-    static Answers answers2 = new() { "a", "b", "c" };
+    static Answers answers;
+    static Answers answers1;
+    static Answers answers2;
 
-    static Question question = new Question("How are you?") { Answers = answers };
-    static Question question1 = new Question("What is number of letter A in alphabet?") { Answers = answers1 };
-    static Question question2 = new Question("What is lover case letter of D?") { Answers = answers2 };
+    static Question question;
+    static Question question1;
+    static Question question2;
 
-    static Test test = new() { Questions = { question, question1, question2 } };
+    static Test test;
     #endregion
+
+
+    [TestInitialize]
+    public void TestInit()
+    {
+        File.Create("file.xml").Close();
+        answers = new() { "A", "B", "C" };
+        answers1 = new() { "1", "0", "-10" };
+        answers2 = new() { "a", "b", "c" };
+
+        question = new Question("How are you?") { Answers = answers };
+        question1 = new Question("What is number of letter A in alphabet?") { Answers = answers1 };
+        question2 = new Question("What is lover case letter of D?") { Answers = answers2 };
+
+
+
+        test = new() { Questions = { question, question1, question2 } };
+    }
+    [TestCleanup]
+    public void TestCleanUp()
+    {
+        File.Delete("file.xml");
+    }
 
     [TestMethod()]
     public void InteractionTest()
@@ -42,9 +65,8 @@ public class InteractionTests
         bool expected = true;
 
         //act
-        Interaction interaction = new();
-        var question = interaction.CreateQuestion("How old are 123 you?");
-        bool actual = interaction.IsQuestionValid(question);
+        var question = inter.CreateQuestion("How old are 123 you?");
+        bool actual = Interaction.IsQuestionValid(question);
 
         //assert
         Assert.AreEqual(expected, actual, question);
@@ -62,7 +84,7 @@ public class InteractionTests
         bool expected = false;
 
         //act
-        bool actual = inter.IsQuestionValid(questionS);
+        bool actual = Interaction.IsQuestionValid(questionS);
 
         //assert
         Assert.AreEqual(expected, actual);
@@ -77,7 +99,7 @@ public class InteractionTests
         int index = 2;
 
         //act
-        bool actual = inter.IsIndexValid(index, test[0].Answers);
+        bool actual = Interaction.IsIndexValid(index, test[0].Answers);
 
         //assert
         Assert.IsTrue(actual);
@@ -90,7 +112,7 @@ public class InteractionTests
         int index = -1;
 
         //act
-        bool actual = inter.IsIndexValid(index, test.Questions);
+        bool actual = Interaction.IsIndexValid(index, test.Questions);
 
         //assert
         Assert.IsFalse(actual);
@@ -104,13 +126,12 @@ public class InteractionTests
 
         //act
         Debug.WriteLine(test.Count);
-        bool actual = inter.IsIndexValid(index, test.Questions);
+        bool actual = Interaction.IsIndexValid(index, test.Questions);
 
         //assert
         Assert.IsFalse(actual);
     }
     #endregion
-
 
     #region AddTest
     [TestMethod()]
@@ -152,7 +173,7 @@ public class InteractionTests
         var actual = inter.GetTest();
 
 
-        Assert.AreEqual(expected.ToString() , actual.ToString() );
+        Assert.AreEqual(expected.ToString(), actual.ToString());
     }
 
     [TestMethod()]
@@ -178,9 +199,13 @@ public class InteractionTests
         var expected = test;
 
         //act
-        File.Create("file1.xml").Close();
-        inter = new("file1.xml");
-        inter.GetTest();
+        File.Create("file2.xml").Close();
+        var sw = File.OpenWrite("file2.xml");
+        sw.Write(new byte[] { 1, 2, 3, 4 }, 0, 4);
+        sw.Close();
+
+        inter = new("file2.xml");
+        var actual = inter.GetTest();
 
         //Assert.AreEqual(expected, actual, actual.ToString());
     }
@@ -280,7 +305,6 @@ public class InteractionTests
 
         //act
         inter = new("file.xml");
-        inter.ClearFile();
         var actualQ = inter.CreateQuestion(question);
         inter.AddQuestion("How are you?");
         inter.AddAnswer(0, "D");
@@ -297,7 +321,7 @@ public class InteractionTests
         //arrange 
         Question expectedQ = new("How are you?") { Answers = answers };
         expectedQ.Answers.Add("D");
-        Test expected = new() {Questions = { expectedQ } };
+        Test expected = new() { Questions = { expectedQ } };
 
 
         //act
@@ -322,7 +346,7 @@ public class InteractionTests
         //act
         inter = new("file.xml");
         inter.ClearFile();
-        var actualQ = inter.CreateQuestion(question);
+        //var actualQ = inter.CreateQuestion(question);
         inter.AddQuestion(question);
         inter.AddAnswer(3, "D");
         inter.AddAnswer(3, "E");
@@ -349,7 +373,7 @@ public class InteractionTests
         var actual = inter.GetTest();
 
         //assert
-        Assert.AreEqual(expected.ToString() , actual.ToString());
+        Assert.AreEqual(expected.ToString(), actual.ToString());
     }
 
     #region CreateQuestion
@@ -448,5 +472,22 @@ public class InteractionTests
     public void GetPersentOfRightAnswersTest()
     {
         //Assert.Fail();
+    }
+
+    [TestMethod()]
+    public void Clear_Success()
+    {
+        //arrange 
+        string expected = "";
+
+        //act
+        inter.FilePath = "file.xml";
+        inter.AddTest(test);
+        inter.ClearFile();
+
+        string actual = File.ReadAllText("file.xml");
+
+        //assert
+        Assert.AreEqual(expected, actual);
     }
 }

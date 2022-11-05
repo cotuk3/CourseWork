@@ -1,8 +1,10 @@
 ﻿using BusinessLogicLayer;
-using BusinessLogicLayer.Entity;
+using BusinessLogicLayer.Entity.Stats;
+using BusinessLogicLayer.Entity.Test;
 using BusinessLogicLayer.Exceptions;
 using ConsoleMenuBase;
 using System.Collections;
+using System.Data.SqlTypes;
 using System.Runtime.Serialization;
 
 namespace PresentationLayer;
@@ -12,20 +14,22 @@ public class MyConsoleMenu : ConsoleMenu
     static Dictionary<string, Action> mainMenu = new Dictionary<string, Action>();
     static Dictionary<string, Action> changeMenu = new Dictionary<string, Action>();
     static Interaction inter = new();
+    static Exception unknownCommand = new("Unknown Command!");
 
     public MyConsoleMenu()
     {
-        mainMenu.Add("/info", () => Info());
-        mainMenu.Add("/create", () => Create(false));
-        mainMenu.Add("/create def", () => Create(true));
-        mainMenu.Add("/change", () => StartChanging());
-        mainMenu.Add("/pass", () => PassTest());
-        mainMenu.Add("/stats", () => StartStats());
-        mainMenu.Add("/show", () => ShowTest());
-        mainMenu.Add("/get all", () => ShowQuestions());
-        mainMenu.Add("/clear", () => ClearFile());
-        mainMenu.Add("/cls", () => { Console.Clear(); Info(); });
-        mainMenu.Add("/end", () => { Console.WriteLine("Bye, have a good time!"); Console.Read(); });
+        mainMenu.Add("/info", () => Info());                       // +
+        mainMenu.Add("/create", () => Create(false));              // 
+        mainMenu.Add("/create def", () => Create(true));           // 
+        mainMenu.Add("/change", () => StartChanging());            // 
+        mainMenu.Add("/pass", () => PassTest());                   // 
+        mainMenu.Add("/stats", () => StartStats());                // 
+        mainMenu.Add("/show", () => ShowTest());                   // +
+        mainMenu.Add("/get all", () => ShowQuestions());           // +
+        mainMenu.Add("/clear", () => ClearFile());                 // 
+        mainMenu.Add("/cls", () => Console.Clear());               // +
+        mainMenu.Add("/end", () =>                                 // +
+        { Console.WriteLine("Bye, have a good time!"); Console.Read(); });
 
         changeMenu.Add("/info", () => ChangeInfo());
         changeMenu.Add("/question", () => StartChangingQuestion());
@@ -86,7 +90,7 @@ public class MyConsoleMenu : ConsoleMenu
                     mainMenu[input]();
                 else
                 {
-                    Console.WriteLine("Unknow Command");
+                    throw unknownCommand;
                 }
             }
             catch(SerializationException)
@@ -238,11 +242,12 @@ public class MyConsoleMenu : ConsoleMenu
     #region Create
     public void Create(bool def)
     {
+        Console.Clear();
         if(!AskForFilePath(ref inter))
             return;
         if(def)
         {
-            inter.AddTest(inter.DefTest);
+            inter.AddTest(Interaction.DefTest);
             ShowTest(true);
         }
         else
@@ -296,7 +301,7 @@ public class MyConsoleMenu : ConsoleMenu
                     changeMenu[input]();
                 else
                 {
-                    Console.WriteLine("Unknow Command");
+                    throw unknownCommand;
                 }
             }
             catch(SerializationException)
@@ -309,7 +314,7 @@ public class MyConsoleMenu : ConsoleMenu
             }
             Console.ReadKey();
         } while(true);
-    } // working 1/11 1:57 p.m
+    }
     private void StartChangingQuestion()
     {
         do
@@ -339,13 +344,13 @@ public class MyConsoleMenu : ConsoleMenu
                 ChangeQuestion();
                 break;
                 default:
-                Console.WriteLine("Unknow Command");
+                Console.WriteLine(unknownCommand.Message);
                 Console.ReadKey();
                 continue;
             }
             Console.ReadKey();
         } while(true);
-    } // working 1/11 1:57 p.m
+    }
     private void StartChangingAnswers()
     {
     //ask question index while it is not valid
@@ -370,7 +375,7 @@ public class MyConsoleMenu : ConsoleMenu
 
             --questionIndex; // because in list counting starts from 0 
 
-            if(!inter.IsIndexValid(questionIndex, test.Questions))
+            if(!Interaction.IsIndexValid(questionIndex, test.Questions))
             {
                 Console.WriteLine(inter.wrongIndex.Message);
                 Console.ReadKey();
@@ -411,19 +416,20 @@ public class MyConsoleMenu : ConsoleMenu
                 SetRightAnswer(questionIndex);
                 break;
                 default:
-                Console.WriteLine("Unknow Command");
+                Console.WriteLine(unknownCommand.Message);
                 Console.ReadKey();
                 continue;
             }
 
         } while(true);
-    } // working 1/11 1:57 p.m
+    } 
     #endregion
 
     #region Changing Question
     private void AddQuestion()
-    {
-        ShowQuestions(true);
+    {    
+        if(inter.Count != -1)
+            ShowQuestions(true);
         //ask for question and while question is not valid
         //or question != /return keep asking
         Question question;
@@ -500,7 +506,7 @@ public class MyConsoleMenu : ConsoleMenu
         } while(!int.TryParse(input, out questionIndex));
         --questionIndex; // because in list counting starts from 0
 
-        if(inter.IsIndexValid(questionIndex, Test.Questions))
+        if(Interaction.IsIndexValid(questionIndex, Test.Questions))
         {
         // enter new question while it is not valid
         loop2:
@@ -553,7 +559,7 @@ public class MyConsoleMenu : ConsoleMenu
 
         //enter index of right answer while it is not valid
         SetRightAnswer(questionIndex);
-    } // working 1/11 1:57 p.m
+    } 
     private void DeleteAnswer(int questionIndex)
     {
     //enter index of answer while it is not valid
@@ -563,7 +569,7 @@ public class MyConsoleMenu : ConsoleMenu
         if(!AskAnswerIndex(questionIndex, ref answerIndex, answers))
             goto set;
 
-        if(!inter.IsIndexValid(answerIndex, answers))
+        if(!Interaction.IsIndexValid(answerIndex, answers))
         {
             Console.WriteLine(inter.wrongIndex.Message);
             goto loop1;
@@ -577,7 +583,7 @@ public class MyConsoleMenu : ConsoleMenu
         set:
         //enter index of right answer while it is not valid
         SetRightAnswer(questionIndex);
-    } // working 1/11 1:57 p.m
+    } 
     private void ChangeAnswer(int questionIndex)
     {
     //enter index of answer while it is not valid
@@ -588,7 +594,7 @@ public class MyConsoleMenu : ConsoleMenu
         if(!AskAnswerIndex(questionIndex, ref answerIndex, answers))
             goto set;
 
-        if(!inter.IsIndexValid(answerIndex, answers))
+        if(!Interaction.IsIndexValid(answerIndex, answers))
         {
             Console.WriteLine(inter.wrongIndex.Message);
             goto loop1;
@@ -599,7 +605,7 @@ public class MyConsoleMenu : ConsoleMenu
 
     set:
         SetRightAnswer(questionIndex);
-    } // working 1/11
+    } 
     private void SetRightAnswer(int questionIndex)
     {
     loop:
@@ -625,7 +631,7 @@ public class MyConsoleMenu : ConsoleMenu
             Console.WriteLine(e.Message);
             goto loop;
         }
-    } // working 1/11
+    } 
     private bool AskAnswerIndex(int questionIndex, ref int answerIndex, IList answers)
     {
         //var answers = Test[questionIndex].Answers;
@@ -643,7 +649,8 @@ public class MyConsoleMenu : ConsoleMenu
 
         answerIndex--;
         return true;
-    } // working 1/11 1:57 p.m
+    } 
+
 
     #endregion
 
@@ -786,15 +793,16 @@ public class MyConsoleMenu : ConsoleMenu
         string? input = "";
         do
         {
+        loop:
             Console.Clear();
             StatisticInfo();
             try
             {
-            loop:
+            
                 Console.Write("Enter what you want to do: ");
                 input = Console.ReadLine();
-                int number;
-                if(int.TryParse(input, out number))
+
+                if(int.TryParse(input, out int number))
                 {
                     switch(number)
                     {
@@ -819,13 +827,15 @@ public class MyConsoleMenu : ConsoleMenu
                         mainMenu["/cls"]();
                         break;
                         default:
-                        Console.WriteLine("Unknow Command");
+                        throw unknownCommand;
+                        Console.ReadKey();
                         goto loop;
                     }
                 }
                 else
                 {
-                    Console.WriteLine("Unknow Command");
+                    throw unknownCommand;
+                    Console.ReadKey();
                 }
             }
             catch(SerializationException)
@@ -835,8 +845,9 @@ public class MyConsoleMenu : ConsoleMenu
             catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                Console.ReadKey();
             }
-            Console.ReadKey();
+
         } while(input != "/return");
 
     }
