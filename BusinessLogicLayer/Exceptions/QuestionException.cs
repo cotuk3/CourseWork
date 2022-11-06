@@ -1,4 +1,5 @@
-﻿using System.Runtime.Serialization;
+﻿using System;
+using System.Runtime.Serialization;
 
 namespace BusinessLogicLayer.Exceptions;
 [Serializable]
@@ -9,7 +10,7 @@ public class QuestionException : Exception
     {
     }
     public QuestionException(string? message)
-        : base(message)
+        : base($"Index: {message} is not valid for test!")
     {
     }
 

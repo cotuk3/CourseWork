@@ -19,23 +19,35 @@ public class Statistic : List<string>
     {
         string userString = user.ToString();
 
-        Statistic userStats = (Statistic)(from s in this
-                                          where s.StartsWith(userString)
-                                          select s).ToList();
+        var listStats = from s in this
+                        where s.StartsWith(userString)
+                        select s;
+
+        Statistic userStats = new();
+        foreach(var stat in listStats)
+        {
+            userStats.Add(stat);
+        }
 
         //if we didnt find any entry throw exception
-        return userStats.Count != 0 ? userStats : throw new Exception("Unknow user!");
+        return userStats.Count != 0 ? userStats : throw new Exception("No entry for this user!");
     }
     public Statistic GetStatsByDate(DateTime time)
     {
-        string dateString = $"{time:dd.MM.yyyy}";
+        string dateString = time.ToString("MM.dd.yyyy");
+        
+        var listStats = from s in this
+                        where s.Contains(dateString)
+                        select s;
 
-        Statistic dateStats = (Statistic)(from s in this
-                                          where s.Contains(dateString)
-                                          select s).ToList();
+        Statistic dateStats = new();
+        foreach(var stat in listStats)
+        {
+            dateStats.Add(stat);
+        }
 
         //if we didnt find any entry throw exception
-        return dateStats.Count != 0 ? dateStats : throw new Exception("Unknow user!");
+        return dateStats.Count != 0 ? dateStats : throw new Exception("No entry for this date!");
     }
 
     public override string ToString()
