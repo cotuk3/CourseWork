@@ -146,7 +146,7 @@ public class Interaction
     }
     public void DeleteQuestion(int index)
     {
-        var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
+        var test = deser[_fileExtension](_filePath) as Test;
 
         if(IsIndexValid(index, test.Questions))
         {
@@ -228,7 +228,7 @@ public class Interaction
         var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
 
         if(IsIndexValid(questionIndex, test.Questions))
-        {   
+        {
             Question question = test[questionIndex];
 
             ChangeAnswer(ref question, answerIndex, answer);
@@ -301,6 +301,45 @@ public class Interaction
 
         test.AddStatistic(user, mark);
 
+        AddTest(test);
+    }
+
+    public string? CheckForRightAnswers()
+    {
+        List<int> answers = GetNotExistingRightAnswers();
+
+        string res = null;
+        if(answers.Count == 0)
+            return res;
+        else
+        {
+            res = "Questions: ";
+            foreach(int i in answers)
+                res += $"{i + 1}, ";
+
+            res += "don't have right answers!";
+        }
+        return res;
+    }
+    public List<int> GetNotExistingRightAnswers()
+    {
+        List<int> answers = new();
+        var test = deser[_fileExtension](_filePath) as Test;
+
+        for(int i = 0; i < test.Questions.Count; i++)
+        {
+            if(!test.Questions[i].CheckForRightAnswers())
+            {
+                answers.Add(i);
+            }
+        }
+        return answers;
+    }
+
+    public void Reset()
+    {
+        var test = deser[_fileExtension](_filePath) as Test;
+        test.Reset();
         AddTest(test);
     }
 }
