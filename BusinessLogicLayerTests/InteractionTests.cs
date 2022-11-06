@@ -9,7 +9,7 @@ namespace BusinessLogicLayer.Tests;
 public class InteractionTests
 {
     #region Fields
-    static Interaction inter = new();
+    static Interaction inter;
 
     static Answers answers;
     static Answers answers1;
@@ -22,7 +22,7 @@ public class InteractionTests
     static Test test;
     #endregion
 
-
+    #region Preparation/CleanUp
     [TestInitialize]
     public void TestInit()
     {
@@ -35,15 +35,16 @@ public class InteractionTests
         question1 = new Question("What is number of letter A in alphabet?") { Answers = answers1 };
         question2 = new Question("What is lover case letter of D?") { Answers = answers2 };
 
-
-
         test = new() { Questions = { question, question1, question2 } };
+        inter = new("file.xml");
+        //inter.AddTest(test);
     }
     [TestCleanup]
     public void TestCleanUp()
     {
         File.Delete("file.xml");
     }
+    #endregion
 
     [TestMethod()]
     public void InteractionTest()
@@ -138,8 +139,8 @@ public class InteractionTests
     public void Add_1Test_Success()
     {
         //act
-        inter = new("file.xml");
-        inter.ClearFile();
+        
+        
         inter.AddTest(test);
     }
 
@@ -152,8 +153,8 @@ public class InteractionTests
         expected.AddRange(test.Questions);
 
         //act
-        inter = new("file.xml");
-        inter.ClearFile();
+        
+        
         inter.AddTest(test);
         inter.AddTest(test);
     }
@@ -167,8 +168,8 @@ public class InteractionTests
         var expected = test;
 
         //act
-        inter = new("file.xml");
-        inter.ClearFile();
+        
+        
         inter.AddTest(test);
         var actual = inter.GetTest();
 
@@ -211,6 +212,7 @@ public class InteractionTests
     }
     #endregion
 
+    #region AddQuestion
     [TestMethod()]
     public void AddQuestion_Success()
     {
@@ -219,8 +221,8 @@ public class InteractionTests
 
         //act
 
-        inter = new("file.xml");
-        inter.ClearFile();
+        
+        
         inter.AddQuestion(new Question("How are you?"));
         var actual = inter.GetTest();
 
@@ -229,7 +231,12 @@ public class InteractionTests
     }
 
     [TestMethod()]
-    public void DeleteQuestionTest()
+    public void AddQuestion_Fail(){ } //add question never fails
+    #endregion
+
+    #region DeleteQuestion
+    [TestMethod()]
+    public void DeleteQuestion_Success()
     {
         //arrange
         Test expected = new();
@@ -237,8 +244,8 @@ public class InteractionTests
         expected.RemoveAt(1);
 
         //act
-        inter = new("file.xml");
-        inter.ClearFile();
+        
+        
         inter.AddTest(test);
         inter.DeleteQuestion(1);
         var actual = inter.GetTest();
@@ -246,6 +253,31 @@ public class InteractionTests
         //assert
         Assert.AreEqual(expected.ToString(), actual.ToString());
     }
+
+    [ExpectedException(typeof(QuestionException))]
+    [TestMethod()]
+    public void DeleteQuestion_NegativeIndex_Fail() 
+    {
+        //arrange
+        int index = -1;
+
+        //act
+        inter.AddTest(test);
+        inter.DeleteQuestion(index);
+    }
+
+    [ExpectedException(typeof(QuestionException))]
+    [TestMethod()]
+    public void DeleteQuestion_GreaterIndex_Fail()
+    {
+        //arrange
+        int index = 1000;
+
+        //act
+        inter.AddTest(test);
+        inter.DeleteQuestion(index);
+    }
+    #endregion
 
     #region ChangeQuestion
     [TestMethod()]
@@ -258,8 +290,8 @@ public class InteractionTests
         expected[0].Answers = question.Answers;
 
         //act
-        inter = new("file.xml");
-        inter.ClearFile();
+        
+        
         inter.AddTest(test);
         inter.ChangeQuestion(0, question1);
         var actual = inter.GetTest();
@@ -269,112 +301,24 @@ public class InteractionTests
     }
 
     [TestMethod()]
-    [ExpectedException(typeof(IndexOutOfRangeException))]
+    [ExpectedException(typeof(QuestionException))]
     public void ChangeQuestion_WrongIndex_Fail()
     {
-        //act
-        inter = new("file.xml");
-        inter.ClearFile();
+        //act      
+        
         inter.AddTest(test);
         inter.ChangeQuestion(-1, question1);
-        //var actual = inter.GetTest();
     }
 
     [TestMethod()]
     [ExpectedException(typeof(QuestionException))]
     public void ChangeQuestion_WrongQuestion_Fail()
     {
-        //act
-        inter = new("file.xml");
-        inter.ClearFile();
+        //act   
         inter.AddTest(test);
         inter.ChangeQuestion(1, "Hi my name");
-        //var actual = inter.GetTest();
     }
     #endregion
-
-    #region AddAnswer
-    [TestMethod()]
-    public void AddAnswer_Success()
-    {
-        //arrange 
-        Question expectedQ = new("How are you?");
-        expectedQ.Answers.Add("D");
-        Test expected = new() { Questions = { expectedQ } };
-
-
-        //act
-        inter = new("file.xml");
-        var actualQ = Interaction.CreateQuestion(question);
-        inter.AddQuestion("How are you?");
-        inter.AddAnswer(0, "D");
-        var actual = inter.GetTest();
-
-        //assert
-        Assert.AreEqual(expected.ToString(), actual.ToString());
-    }
-
-    [TestMethod()]
-    [ExpectedException(typeof(AnswerException))]
-    public void AddAnswer_WrongAnswer_Fail()
-    {
-        //arrange 
-        Question expectedQ = new("How are you?") { Answers = answers };
-        expectedQ.Answers.Add("D");
-        Test expected = new() { Questions = { expectedQ } };
-
-
-        //act
-        inter = new("file.xml");
-        inter.ClearFile();
-        var actualQ = Interaction.CreateQuestion(question);
-        inter.AddQuestion(question);
-        inter.AddAnswer(0, "D");
-        inter.AddAnswer(0, "E");
-        var actual = inter.GetTest();
-
-
-        //assert
-        Assert.AreEqual(expected, actual, $"{actual} != {expected}");
-    }
-
-    [TestMethod()]
-    [ExpectedException(typeof(IndexOutOfRangeException))]
-    public void AddAnswer_WrongQuestionIndex_Fail()
-    {
-
-        //act
-        inter = new("file.xml");
-        inter.ClearFile();
-        //var actualQ = inter.CreateQuestion(question);
-        inter.AddQuestion(question);
-        inter.AddAnswer(3, "D");
-        inter.AddAnswer(3, "E");
-    }
-    #endregion
-
-    [TestMethod()]
-    public void DeleteAnswerTest()
-    {
-        //arrange 
-        Question expectedQ = new("How are you?") { Answers = answers };
-        expectedQ.Answers.RemoveAt(0);
-        Test expected = new() { Questions = { expectedQ } };
-
-        //act
-        inter = new("file.xml");
-        inter.ClearFile();
-        var actualQ = Interaction.CreateQuestion(question);
-        inter.AddQuestion("How are you?");
-        inter.AddAnswer(0, "A");
-        inter.AddAnswer(0, "B");
-        inter.AddAnswer(0, "C");
-        inter.DeleteAnswer(0, 0);
-        var actual = inter.GetTest();
-
-        //assert
-        Assert.AreEqual(expected.ToString(), actual.ToString());
-    }
 
     #region CreateQuestion
     [TestMethod()]
@@ -404,6 +348,105 @@ public class InteractionTests
     }
     #endregion
 
+    #region AddAnswer
+    [TestMethod()]
+    public void AddAnswer_Success()
+    {
+        //arrange 
+        Question expectedQ = new("How are you?");
+        expectedQ.Answers.Add("D");
+        Test expected = new() { Questions = { expectedQ } };
+
+
+        //act
+        
+        var actualQ = Interaction.CreateQuestion(question);
+        inter.AddQuestion(actualQ);
+        inter.AddAnswer(0, "D");
+        var actual = inter.GetTest();
+
+        //assert
+        Assert.AreEqual(expected.ToString(), actual.ToString());
+    }
+
+    [TestMethod()]
+    [ExpectedException(typeof(AnswerException))]
+    public void AddAnswer_TryingAdd5thAnswer_Fail()
+    {
+        //arrange 
+        Question expectedQ = new("How are you?") { Answers = answers };
+        expectedQ.Answers.Add("D");
+        Test expected = new() { Questions = { expectedQ } };
+
+
+        //act
+        inter.AddQuestion(question);
+        inter.AddAnswer(0, "D");
+        inter.AddAnswer(0, "E");
+        var actual = inter.GetTest();
+
+        //assert
+        Assert.AreEqual(expected, actual, $"{actual} != {expected}");
+    }
+
+    [TestMethod()]
+    [ExpectedException(typeof(QuestionException))]
+    public void AddAnswer_WrongQuestionIndex_Fail()
+    {
+        //act
+        inter.AddQuestion(question);
+        inter.AddAnswer(3, "D");
+    }
+    #endregion
+
+    #region DeleteAnswer
+    [TestMethod()]
+    public void DeleteAnswer_Success()
+    {
+        //arrange 
+        Question expectedQ = new("How are you?") { Answers = answers };
+        expectedQ.Answers.RemoveAt(0);
+        Test expected = new() { Questions = { expectedQ } };
+
+        //act    
+        
+        var actualQ = Interaction.CreateQuestion(question);
+        inter.AddQuestion(actualQ);
+        inter.AddAnswer(0, "A");
+        inter.AddAnswer(0, "B");
+        inter.AddAnswer(0, "C");
+        inter.DeleteAnswer(0, 0);
+        var actual = inter.GetTest();
+
+        //assert
+        Assert.AreEqual(expected.ToString(), actual.ToString());
+    }
+
+    [ExpectedException(typeof(QuestionException))]
+    [TestMethod()]
+    public void DeleteAnswer_NotValidQuestionIndex_Fail()
+    {
+        //arrange
+        int questionIndex = 10, answerIndex = 0;
+
+        //act 
+        inter.AddTest(test);
+        inter.DeleteAnswer(questionIndex, answerIndex);
+    }
+
+    [ExpectedException(typeof(AnswerException))]
+    [TestMethod()]
+    public void DeleteAnswer_NotValidAnswerIndex_Fail()
+    {
+        //arrange
+        int questionIndex = 0, answerIndex = 10;
+
+        //act 
+        inter.AddTest(test);
+        inter.DeleteAnswer(questionIndex, answerIndex);
+    }
+    #endregion
+
     #region SetRightAswer
     [TestMethod()]
     public void SetRightAnswer_Success()
@@ -416,7 +459,7 @@ public class InteractionTests
 
         //act
         inter = new("file1.xml");
-        inter.ClearFile();
+        
         inter.AddTest(test);
         inter.SetRightAnswer(0, 2);
         var actual = inter.GetTest().Questions[0].Answers.RightAnswer;
@@ -426,40 +469,36 @@ public class InteractionTests
     }
 
     [TestMethod()]
-    [ExpectedException(typeof(IndexOutOfRangeException))]
-    public void SetRightAnswer_WrongAnswerIndex_Fail()
-    {
-        inter = new("file.xml");
-        inter.ClearFile();
+    [ExpectedException(typeof(AnswerException))]
+    public void SetRightAnswer_NotValidAnswerIndex_Fail()
+    {      
+        //act
         inter.AddTest(test);
         inter.SetRightAnswer(0, 4);
     }
 
     [TestMethod()]
-    [ExpectedException(typeof(IndexOutOfRangeException))]
-    public void SetRightAnswer_WrongQuestionIndex_Fail()
-    {
-        inter = new("file.xml");
-        inter.ClearFile();
+    [ExpectedException(typeof(QuestionException))]
+    public void SetRightAnswer_NotValidQuestionIndex_Fail()
+    {     
+        //act
         inter.AddTest(test);
         inter.SetRightAnswer(-1, 1);
     }
     #endregion
 
+    #region ChangeAnswer
     [TestMethod()]
-    public void ChangeAnswerTest()
+    public void ChangeAnswer_Success()
     {
         //arrange 
         Question expectedQ = new("How are you?");
         expectedQ.Answers.Add("A");
         Test expected = new() { Questions = { expectedQ } };
 
-
         //act
-        inter = new("file.xml");
-        inter.ClearFile();
         var actualQ = Interaction.CreateQuestion(question);
-        inter.AddQuestion("How are you?");
+        inter.AddQuestion(actualQ);
         inter.AddAnswer(0, "D");
         inter.ChangeAnswer(0, 0, "A");
         var actual = inter.GetTest();
@@ -468,11 +507,25 @@ public class InteractionTests
         Assert.AreEqual(expected.ToString(), actual.ToString());
     }
 
+    [ExpectedException(typeof(QuestionException))]
     [TestMethod()]
-    public void GetPersentOfRightAnswersTest()
+    public void ChangeAnswer_NotValidQuestionIndex_Fail()
     {
-        //Assert.Fail();
+        //act
+        inter.AddTest(test);
+        inter.ChangeAnswer(10, 0, "Q");
     }
+
+    [ExpectedException(typeof(AnswerException))]
+    [TestMethod()]
+    public void ChangeAnswer_NotValidAnswerIndex_Fail()
+    {
+        //act
+        inter.AddTest(test);
+        inter.ChangeAnswer(0, 10, "Q");
+    }
+
+    #endregion
 
     [TestMethod()]
     public void Clear_Success()
