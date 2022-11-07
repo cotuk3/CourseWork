@@ -37,6 +37,9 @@ public class Test : IFormattable
         set => _questions = value;
     }
 
+    /// <summary>
+    /// resets user answers
+    /// </summary>
     public void Reset()
     {
         foreach(var question in _questions)
@@ -55,6 +58,7 @@ public class Test : IFormattable
     {
         _statistic.Add(user, mark);
     }
+
     public string GetLastStatistic()
     {
         return _statistic[^1];
@@ -118,30 +122,32 @@ public class Test : IFormattable
 
         formatProvider ??= CultureInfo.CurrentCulture;
 
+        int index = 1;
         string res = "";
         foreach(var question in _questions)
         {
-            res += question.ToString();
-
+            res += $"{index++}.{question}";
+            res += "\n\t";
             switch(format.ToUpperInvariant())
             {
                 case Answers.answerFormat:
-                res += "\n" + question.Answers.ToString(Answers.answerFormat) + "\n";
+                res += question.Answers.ToString(Answers.answerFormat);
                 break;
 
                 case Answers.testFormat:
-                res += "\n" + question.Answers.ToString(Answers.testFormat) + "\n";
+                res += question.Answers.ToString(Answers.testFormat);
                 break;
 
                 case Answers.compareFormat:
-                res += "\n" + question.Answers.ToString(Answers.compareFormat) + "\n";
+                res += question.Answers.ToString(Answers.compareFormat);
                 break;
 
                 case Answers.defaultFormat:
                 default:
-                res += "\n" + question.Answers.ToString(Answers.defaultFormat) + "\n";
+                res += question.Answers.ToString(Answers.defaultFormat);
                 break;
             }
+            res += "\n\n";
         }
         return res;
     }

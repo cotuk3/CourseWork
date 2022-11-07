@@ -8,7 +8,6 @@ public class UserException : Exception
         : base()
     {
     }
-
     public UserException(string? message)
         : base($"{message} was in wrong format")
     {
@@ -17,12 +16,10 @@ public class UserException : Exception
         : base($"{message} and {message1} were in wrong format")
     {
     }
-
     public UserException(string? message, Exception? innerException)
         : base(message, innerException)
     {
     }
-
     protected UserException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {

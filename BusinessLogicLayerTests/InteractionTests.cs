@@ -79,6 +79,7 @@ public class InteractionTests
     [DataRow("How are you")]
     [DataRow("1ow are you!")]
     [DataRow("how are you!")]
+    [DataRow("1How are you?")]
     public void IsQuestionValid_Fail(string questionS)
     {
         //arrange
@@ -139,8 +140,8 @@ public class InteractionTests
     public void Add_1Test_Success()
     {
         //act
-        
-        
+
+
         inter.AddTest(test);
     }
 
@@ -153,8 +154,8 @@ public class InteractionTests
         expected.AddRange(test.Questions);
 
         //act
-        
-        
+
+
         inter.AddTest(test);
         inter.AddTest(test);
     }
@@ -168,8 +169,8 @@ public class InteractionTests
         var expected = test;
 
         //act
-        
-        
+
+
         inter.AddTest(test);
         var actual = inter.GetTest();
 
@@ -221,8 +222,8 @@ public class InteractionTests
 
         //act
 
-        
-        
+
+
         inter.AddQuestion(new Question("How are you?"));
         var actual = inter.GetTest();
 
@@ -231,7 +232,7 @@ public class InteractionTests
     }
 
     [TestMethod()]
-    public void AddQuestion_Fail(){ } //add question never fails
+    public void AddQuestion_Fail() { } //add question never fails
     #endregion
 
     #region DeleteQuestion
@@ -244,8 +245,8 @@ public class InteractionTests
         expected.RemoveAt(1);
 
         //act
-        
-        
+
+
         inter.AddTest(test);
         inter.DeleteQuestion(1);
         var actual = inter.GetTest();
@@ -256,7 +257,7 @@ public class InteractionTests
 
     [ExpectedException(typeof(QuestionException))]
     [TestMethod()]
-    public void DeleteQuestion_NegativeIndex_Fail() 
+    public void DeleteQuestion_NegativeIndex_Fail()
     {
         //arrange
         int index = -1;
@@ -290,8 +291,8 @@ public class InteractionTests
         expected[0].Answers = question.Answers;
 
         //act
-        
-        
+
+
         inter.AddTest(test);
         inter.ChangeQuestion(0, question1);
         var actual = inter.GetTest();
@@ -305,7 +306,7 @@ public class InteractionTests
     public void ChangeQuestion_WrongIndex_Fail()
     {
         //act      
-        
+
         inter.AddTest(test);
         inter.ChangeQuestion(-1, question1);
     }
@@ -359,7 +360,7 @@ public class InteractionTests
 
 
         //act
-        
+
         var actualQ = Interaction.CreateQuestion(question);
         inter.AddQuestion(actualQ);
         inter.AddAnswer(0, "D");
@@ -409,7 +410,7 @@ public class InteractionTests
         Test expected = new() { Questions = { expectedQ } };
 
         //act    
-        
+
         var actualQ = Interaction.CreateQuestion(question);
         inter.AddQuestion(actualQ);
         inter.AddAnswer(0, "A");
@@ -459,7 +460,7 @@ public class InteractionTests
 
         //act
         inter = new("file1.xml");
-        
+
         inter.AddTest(test);
         inter.SetRightAnswer(0, 2);
         var actual = inter.GetTest().Questions[0].Answers.RightAnswer;
@@ -471,7 +472,7 @@ public class InteractionTests
     [TestMethod()]
     [ExpectedException(typeof(AnswerException))]
     public void SetRightAnswer_NotValidAnswerIndex_Fail()
-    {      
+    {
         //act
         inter.AddTest(test);
         inter.SetRightAnswer(0, 4);
@@ -480,7 +481,7 @@ public class InteractionTests
     [TestMethod()]
     [ExpectedException(typeof(QuestionException))]
     public void SetRightAnswer_NotValidQuestionIndex_Fail()
-    {     
+    {
         //act
         inter.AddTest(test);
         inter.SetRightAnswer(-1, 1);

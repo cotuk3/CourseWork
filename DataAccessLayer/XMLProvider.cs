@@ -21,7 +21,6 @@ public class XMLProvider : DataProvider
             xs.Serialize(fileStream, graph);
         }
     }
-
     public override object? Deserialize(string filePath)
     {
         object? graph;

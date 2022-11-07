@@ -35,7 +35,7 @@ public class Statistic : List<string>
     public Statistic GetStatsByDate(DateTime time)
     {
         string dateString = time.ToString("MM.dd.yyyy");
-        
+
         var listStats = from s in this
                         where s.Contains(dateString)
                         select s;

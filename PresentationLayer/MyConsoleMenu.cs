@@ -18,18 +18,19 @@ public class MyConsoleMenu : ConsoleMenu
 
     public MyConsoleMenu()
     {
-        mainMenu.Add("/info", () => Info());                       // +
-        mainMenu.Add("/create", () => Create(false));              // 
-        mainMenu.Add("/create def", () => Create(true));           // 
-        mainMenu.Add("/change", () => StartChanging());            // 
-        mainMenu.Add("/pass", () => PassTest());                   // 
-        mainMenu.Add("/stats", () => StartStats());                // 
-        mainMenu.Add("/show", () => ShowTest());                   // +
-        mainMenu.Add("/get all", () => ShowQuestions());           // +
-        mainMenu.Add("/clear", () => ClearFile());                 // 
-        mainMenu.Add("/cls", () => Console.Clear());               // +
-        //mainMenu.Add("/end", () =>                                 // +
-        //{ Console.WriteLine("Bye, have a good time!"); Console.Read(); });
+        mainMenu.Add("/info", () => Info());
+        mainMenu.Add("/create", () => Create(false));
+        mainMenu.Add("/create def", () => Create(true));
+        mainMenu.Add("/change", () => StartChanging());
+        mainMenu.Add("/pass", () => PassTest());
+        mainMenu.Add("/stats", () => StartStats());
+        mainMenu.Add("/show", () => ShowTest());
+        mainMenu.Add("/get all", () => ShowQuestions());
+        mainMenu.Add("/clear", () => ClearFile());
+        mainMenu.Add("/cls", () => Console.Clear());
+        mainMenu.Add("/end", () =>
+
+        { Console.WriteLine("Bye, have a good time!"); });
 
         changeMenu.Add("/info", () => ChangeInfo());
         changeMenu.Add("/question", () => StartChangingQuestion());
@@ -39,6 +40,8 @@ public class MyConsoleMenu : ConsoleMenu
     #region Start
     public override void Start()
     {
+        Console.SetWindowSize(90, 20);
+        Console.SetBufferSize(100, 30);
         string? input = "";
         do
         {
@@ -53,7 +56,7 @@ public class MyConsoleMenu : ConsoleMenu
                     {
                         case 1:
                         input = "/info";
-                        break;
+                        continue;
                         case 2:
                         input = "/create";
                         break;
@@ -77,10 +80,10 @@ public class MyConsoleMenu : ConsoleMenu
                         break;
                         case 9:
                         input = "/cls";
-                        break;
+                        continue;
                         case 10:
                         input = "/end";
-                        return;
+                        break;
                     }
 
                 if(mainMenu.ContainsKey(input))
@@ -93,7 +96,7 @@ public class MyConsoleMenu : ConsoleMenu
                 Console.WriteLine(ex.Message);
             }
             Console.ReadKey();
-        } while(true);
+        } while(input != "/end");
     }
     #endregion
 
@@ -120,7 +123,7 @@ public class MyConsoleMenu : ConsoleMenu
             "\n1.question;\n" +
             "2.answers;\n" +
             "3.select file path;\n" +
-            "4.end";
+            "4.return";
         Console.WriteLine(changeInfo);
     }
     private void QuestionInfo()
@@ -149,7 +152,7 @@ public class MyConsoleMenu : ConsoleMenu
             "3.change;\n" +
             "4.set right answer;\n" +
             "5.select question;\n" +
-            "6.end.";
+            "6.return.";
         Console.WriteLine(answerInfo);
     }
     private void PassingInfo(User user)
@@ -160,10 +163,10 @@ public class MyConsoleMenu : ConsoleMenu
             $"user: {user};\n" +
             "\n/next to go to next answer;\n" +
             "/prev to go to previous answer;\n" +
-            "/end;\n";
+            "/return;\n";
         Console.WriteLine(passingInfo);
     }
-    private void StatisticInfo()
+    private static void StatisticInfo()
     {
         string? res = "***** Statistic *****\n" +
             "1.show;\n" +
@@ -200,10 +203,10 @@ public class MyConsoleMenu : ConsoleMenu
 
         Show(Test.Questions);
     }
-    private void ShowQuestion(Test test, int questionIndex)
+    private void ShowQuestion(Test test, int questionIndex, string format = "T")
     {
         var question = test[questionIndex];
-        string res = question + "\n" + question.Answers.ToString("T");
+        string res = $"{questionIndex + 1}." + question + "\n\t" + question.Answers.ToString(format);
         Console.WriteLine(res);
     }
 
@@ -226,6 +229,7 @@ public class MyConsoleMenu : ConsoleMenu
     #region Create
     /// <summary>
     /// ask file path,
+    /// then clears file,
     /// then if def adds to file Interaction.DefList
     /// else calls AddQuestion
     /// </summary>
@@ -234,11 +238,19 @@ public class MyConsoleMenu : ConsoleMenu
     {
         if(!AskForFilePath(ref inter))
             return;
+        try
+        {
+            ClearFile(true);
+        }
+        catch
+        {
+
+        }
 
         if(def)
         {
             inter.AddTest(Interaction.DefTest);
-            ShowTest(true);
+            ShowTest(true, "A");
         }
         else
         {
@@ -383,7 +395,7 @@ public class MyConsoleMenu : ConsoleMenu
 
             if(!Interaction.IsIndexValid(questionIndex, test.Questions))
             {
-                Console.WriteLine(new QuestionException(questionIndex + 1).Message);
+                Console.WriteLine(new QuestionException(questionIndex).Message);
                 Console.ReadKey();
                 continue;
             }
@@ -442,15 +454,18 @@ public class MyConsoleMenu : ConsoleMenu
     /// </summary>
     private void AddQuestion()
     {
-        //if we add first question in test do not show all questions
-        if(inter.Count != -1)
-            ShowQuestions(true);
-
         Question question;
 
         do
         {
             Console.Clear();
+
+            Console.WriteLine("***** Add Question *****");
+
+            //if we add first question in test do not show all questions
+            if(inter.Count != -1)
+                ShowQuestions(true);
+
             Console.Write("Enter your question or /return to stop" +
                 "\n(your question should star with upper case letter and end with ?(question mark))\n: ");
             string questionString = Console.ReadLine();
@@ -465,6 +480,7 @@ public class MyConsoleMenu : ConsoleMenu
             catch(Exception ex)
             {
                 Console.WriteLine(ex.Message);
+                Console.ReadKey();
                 continue;
             }
 
@@ -473,7 +489,8 @@ public class MyConsoleMenu : ConsoleMenu
             int questionIndex = Test.Questions.IndexOf(question);
 
             AddAnswer(questionIndex);
-            ShowTest(true);
+            ShowTest(true, "A");
+            Console.ReadKey();
         } while(true);
     }
 
@@ -484,9 +501,11 @@ public class MyConsoleMenu : ConsoleMenu
     {
         do
         {
-            int questionIndex;
             string input;
 
+            Console.Clear();
+
+            Console.WriteLine("***** Delete Question *****");
             ShowQuestions(true);
             Console.Write("Enter index of question which you want to delete" +
                 "\nor /return to stop: ");
@@ -495,7 +514,8 @@ public class MyConsoleMenu : ConsoleMenu
             if(input == "/return" || input == "/end")
                 return;
 
-            if(!int.TryParse(input, out questionIndex))
+            //if user enter not digit
+            if(!int.TryParse(input, out int questionIndex))
             {
                 Console.WriteLine(new QuestionException(input).Message);
                 Console.ReadKey();
@@ -510,6 +530,7 @@ public class MyConsoleMenu : ConsoleMenu
             catch(Exception e)
             {
                 Console.WriteLine(e.Message);
+                Console.ReadKey();
                 continue;
             }
 
@@ -521,54 +542,62 @@ public class MyConsoleMenu : ConsoleMenu
     }
 
     /// <summary>
-    /// changes selected by user qustion
+    /// changes selected by user question
     /// </summary>
     private void ChangeQuestion()
     {
-    // enter index of question while it is not valid
-    askQuestionIndex:
-
-        string input;
-        int questionIndex;
-
-        ShowQuestions(true);
-        Console.Write("Enter index of question which you want to change: ");
-        input = Console.ReadLine();
-        if(input == "/return" || input == "/end")
-            return;
-
-        if(!int.TryParse(input, out questionIndex))
+        // enter index of question while it is not valid
+        do
         {
-            Console.WriteLine(new QuestionException(input).Message);
-            Console.ReadKey();
-            goto askQuestionIndex;
-        }
+            string input;
 
-        --questionIndex; // because in list counting starts from 0
+            Console.Clear();
 
-        if(Interaction.IsIndexValid(questionIndex, Test.Questions))
-        {
-        // enter new question while it is not valid
-        loop2:
-            Console.Write("Enter new question: ");
-            string question = Console.ReadLine();
+            Console.WriteLine("***** Change Question *****");
+            ShowQuestions(true);
 
-            try
+            Console.Write("Enter index of question which you want to change" +
+                "\nor /return to stop: ");
+            input = Console.ReadLine();
+
+            if(input == "/return" || input == "/end")
+                return;
+
+            //if user enter not digit
+            if(!int.TryParse(input, out int questionIndex))
             {
-                inter.ChangeQuestion(questionIndex, Interaction.CreateQuestion(question));
+                Console.WriteLine(new QuestionException(input).Message);
+                Console.ReadKey();
+                continue;
             }
-            catch(Exception e)
+
+            --questionIndex; // because in list counting starts from 0
+
+            if(Interaction.IsIndexValid(questionIndex, Test.Questions))
             {
-                Console.WriteLine(e.Message);
-                goto loop2;
+            // enter new question while it is not valid
+            loop2:
+                Console.Write("Enter new question: ");
+                string question = Console.ReadLine();
+
+                try
+                {
+                    inter.ChangeQuestion(questionIndex, Interaction.CreateQuestion(question));
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                    goto loop2;
+                }
             }
-        }
-        else
-        {
-            Console.WriteLine(new QuestionException(questionIndex).Message);
-            goto askQuestionIndex;
-        }
-        ShowQuestions(true);
+            else
+            {
+                Console.WriteLine(new QuestionException(questionIndex).Message);
+                Console.ReadKey();
+                continue;
+            }
+            ShowQuestions(true);
+        } while(true);
     }
     #endregion
 
@@ -580,7 +609,6 @@ public class MyConsoleMenu : ConsoleMenu
     /// <param name="questionIndex">Index of question to which answers are added</param>
     private void AddAnswer(int questionIndex)
     {
-
         do
         {
             var test = Test;
@@ -588,12 +616,13 @@ public class MyConsoleMenu : ConsoleMenu
 
             if(question.Answers.Count < Answers.maxCapacity)
             {
-                Console.WriteLine(question + $"\n{question.Answers}");
+                Console.Clear();
+                Console.WriteLine("***** Add Answer *****");
+                ShowQuestion(test, questionIndex);
                 Console.Write("Enter your answer" +
-                    "\nto stop enter /end" +
-                    "\n: ");
+                    "\nor /return to stop: ");
                 string input = Console.ReadLine();
-                if(input == "/end")
+                if(input == "/end" || input == "/return")
                 {
                     break;
                 }
@@ -622,7 +651,7 @@ public class MyConsoleMenu : ConsoleMenu
         int answerIndex = 0;
 
         //if user enter /return stop deleting answers and ask for right answer
-        if(!AskAnswerIndex(ref answerIndex, answers))
+        if(!AskAnswerIndex("***** Delete Answer *****", ref answerIndex, questionIndex))
             goto setRightAnswer;
 
         int count = answers.Count;
@@ -657,12 +686,13 @@ public class MyConsoleMenu : ConsoleMenu
         var answers = Test[questionIndex].Answers;
         int answerIndex = 0;
 
-        if(!AskAnswerIndex(ref answerIndex, answers))
+        if(!AskAnswerIndex("***** Change Answer *****", ref answerIndex, questionIndex))
             goto set;
 
         if(!Interaction.IsIndexValid(answerIndex, answers))
         {
-            Console.WriteLine(Interaction.wrongAnswer.Message);
+            Console.WriteLine(new AnswerException(answerIndex).Message);
+            Console.ReadKey();
             goto loop1;
         }
 
@@ -684,17 +714,26 @@ public class MyConsoleMenu : ConsoleMenu
         var question = Test[questionIndex];
         var answers = question.Answers;
         if(answers.Count <= 0)
+        {
+            inter.ReserRightAnswer(questionIndex);
             return;
-        Console.Write($"Please choose right answer (1-{answers.Count})\n" +
-                $"{question}\n" +
-                $"{answers:A}\n" +
-                $":");
+        }
+
+        Console.Clear();
+        Console.WriteLine("***** Set Right Answer *****");
+        ShowQuestion(Test, questionIndex, "A");
+        Console.Write($"Please enter right answer (1-{answers.Count})\n" +
+                $"or /return to stop: ");
 
         string? rightAnswer = Console.ReadLine();
         if(rightAnswer == "/return" || rightAnswer == "/end")
             return;
         if(!int.TryParse(rightAnswer, out int rightAnswerIndex))
+        {
+            Console.WriteLine(new AnswerException(rightAnswer).Message);
+            Console.ReadKey();
             goto loop;
+        }
         --rightAnswerIndex;
         try
         {
@@ -703,6 +742,7 @@ public class MyConsoleMenu : ConsoleMenu
         catch(Exception e)
         {
             Console.WriteLine(e.Message);
+            Console.ReadKey();
             goto loop;
         }
     }
@@ -713,22 +753,32 @@ public class MyConsoleMenu : ConsoleMenu
     /// <param name="answerIndex">ref not out because if user enters /return or /end answerIndex is not set</param>
     /// <param name="answers"></param>
     /// <returns></returns>
-    private static bool AskAnswerIndex(ref int answerIndex, IList answers)
+    private bool AskAnswerIndex(string info, ref int answerIndex, int questionIndex)
     {
         string input;
         do
         {
             Console.Clear();
+            Console.WriteLine(info);
+            ShowQuestion(Test, questionIndex);
             Console.Write("Enter index of answer" +
-                "\nto end enter /return" +
-                $"\n{answers}" +
-                "\n: ");
+                "\nor /return to stop: ");
 
             input = Console.ReadLine();
             if(input == "/return" || input == "/end")
                 return false;
 
-        } while(!int.TryParse(input, out answerIndex));
+            if(!int.TryParse(input, out answerIndex))
+            {
+                Console.WriteLine(new AnswerException(input).Message);
+                Console.ReadKey();
+            }
+            else
+            {
+                break;
+            }
+
+        } while(true);
 
         answerIndex--;
         return true;
@@ -741,7 +791,6 @@ public class MyConsoleMenu : ConsoleMenu
         User user;
         do
         {
-            Console.Clear();
             Console.Write("Enter your first name: ");
             string? firstName = Console.ReadLine();
 
@@ -769,10 +818,13 @@ public class MyConsoleMenu : ConsoleMenu
     }
     private void PassTest()
     {
+
     //ask for file path while file does not contain test
     loop:
         if(!AskForFilePath(ref inter))
             return;
+
+        inter.Reset();
         Console.Clear();
 
         Test test;
@@ -787,7 +839,7 @@ public class MyConsoleMenu : ConsoleMenu
             goto loop;
         }
 
-        inter.Reset();
+
 
         string? rightAnswers = inter.CheckForRightAnswers();
 
@@ -799,25 +851,25 @@ public class MyConsoleMenu : ConsoleMenu
         }
 
         //ask user name and lastname
-        User user = AskUserData();
+        User? user = AskUserData();
         if(user is null)
             goto loop;
 
-        Console.Clear();
-        PassingInfo(user);
         int questionIndex = 0;
-    loop2:
+
+        //answer the questions
         while(true)
         {
+            Console.Clear();
+            PassingInfo(user);
+
+            // if user has answered to the last question return to first question
             if(questionIndex == inter.Count)
             {
-                Console.Clear();
-                PassingInfo(user);
                 questionIndex = 0;
             }
 
-        //answer the questions till user enter /end 
-        loop1:
+            //answer the questions till user enter /end or /return 
             string input;
 
             ShowQuestion(test, questionIndex);
@@ -831,7 +883,7 @@ public class MyConsoleMenu : ConsoleMenu
                     questionIndex = 0;
                 else
                     questionIndex++;
-                goto loop2;
+                continue;
             }
 
             if(input == "/prev")
@@ -840,40 +892,41 @@ public class MyConsoleMenu : ConsoleMenu
                     questionIndex = inter.Count - 1;
                 else
                     questionIndex--;
-                goto loop2;
+                continue;
             }
 
-            if(input == "/end")
+            if(input == "/end" || input == "/return")
                 break;
 
             //int answerIndex;
             if(!int.TryParse(input, out int answerIndex))
             {
-                Console.WriteLine("Answer is not valid!");
-                goto loop1;
+                Console.WriteLine(new AnswerException(input).Message);
+                Console.ReadKey();
+                continue;
             }
 
-            if(answerIndex < 1 || answerIndex > 4)
+            --answerIndex;
+
+            if(answerIndex < 0 || answerIndex > 3)
             {
-                Console.WriteLine("Answer is not valid!");
-                goto loop1;
+                Console.WriteLine(new AnswerException(answerIndex).Message);
+                Console.ReadKey();
+                continue;
             }
 
-            test[questionIndex].UserAnswer = --answerIndex;
+            test[questionIndex].UserAnswer = answerIndex;
 
             questionIndex++;
         }
 
-        ClearFile(true);
-        inter.AddTest(test);
-
         inter.GetPersentOfRightAnswers(test, DateTime.Now, user);
-        test = Test;
-        string res = test.GetLastStatistic();
-        Console.WriteLine(res);
+
         ShowTest(true, "C");
-        inter.Reset();
-    } // TODO : refactor
+
+        string res = Test.GetLastStatistic();
+        Console.WriteLine(res);
+    }
     #endregion
 
     #region Stats
@@ -995,10 +1048,12 @@ public class MyConsoleMenu : ConsoleMenu
         try
         {
             inter.FilePath = filePath;
-            FilePath = inter.FilePath;
+            this.FilePath = inter.FilePath;
         }
         catch
         {
+            Console.WriteLine(Interaction.wrongFile.Message);
+            Console.ReadKey();
             goto loop;
         }
 
@@ -1007,12 +1062,12 @@ public class MyConsoleMenu : ConsoleMenu
     private void ClearFile(bool filled = false)
     {
         if(!filled && !AskForFilePath(ref inter))
-                return;
+            return;
 
         inter.ClearFile();
     }
     private string? FilePath { get; set; }
-    private Test Test
+    private static Test Test
     {
         get => inter.GetTest();
     }

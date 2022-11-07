@@ -60,13 +60,13 @@ public class Question
     }
     public void Reset()
     {
-        _answers.UserAnswer = null;
+        UserAnswer = null;
     }
-    
+
     //returns true if right answer is set
-    public bool CheckForRightAnswers()
+    public bool CheckForRightAnswer()
     {
-        return _answers.RightAnswer is not null;
+        return RightAnswer is not null;
     }
     #endregion
 

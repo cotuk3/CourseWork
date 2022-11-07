@@ -8,17 +8,18 @@ public class AnswerException : Exception
         : base("You has exceeded max count of answers!")
     {
     }
-
-    public AnswerException(string? message)
-        : base(message)
+    public AnswerException(int index)
+        : base($"Index: {index + 1} is not valid for answers!")
     {
     }
-
+    public AnswerException(string? message)
+        : base($"Index: {message} is not valid for answers!")
+    {
+    }
     public AnswerException(string? message, Exception? innerException)
         : base(message, innerException)
     {
     }
-
     protected AnswerException(SerializationInfo info, StreamingContext context)
         : base(info, context)
     {

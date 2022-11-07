@@ -7,7 +7,6 @@ public class BinaryProvider : DataProvider
         : base(type)
     {
     }
-
     public override void Serialize(object graph, string filePath)
     {
         using(FileStream fileStream = File.Open(filePath, FileMode.OpenOrCreate, FileAccess.Write))
@@ -16,7 +15,6 @@ public class BinaryProvider : DataProvider
             bf.Serialize(fileStream, graph);
         }
     }
-
     public override object? Deserialize(string filePath)
     {
         object? graph;

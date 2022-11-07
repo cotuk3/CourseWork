@@ -13,7 +13,6 @@ public class Interaction
     string? _fileExtension;
 
     public static readonly ArgumentException wrongFile = new("File or file extension is not valid!");
-    //public static readonly IndexOutOfRangeException wrongIndex = new("Index out of range!");
     public static readonly QuestionException wrongQuestion = new();
     public static readonly AnswerException wrongAnswer = new();
 
@@ -38,7 +37,7 @@ public class Interaction
         {".json", (graph, filePath) => new JSONProvider(typeof(Test)).Serialize(graph, filePath) }
     };
 
-    static readonly Regex validQuestion = new(@"^[A-Z a-z1-9,+\-:*\\|/A-Z]+\?$");
+    static readonly Regex validQuestion = new(@"^[A-Z]{1}[ a-z1-9,+\-:*\\|/A-Z]+\?$");
     #endregion
 
     #region Ctors
@@ -125,6 +124,32 @@ public class Interaction
         {
             throw new FileNotFoundException("File not found!");
         }
+    }
+    public void GetPersentOfRightAnswers(Test test, DateTime time, User user)
+    {
+        AddTest(test);
+        int count = 0;
+
+        foreach(Question question in test.Questions)
+        {
+            if(question.RightAnswer == question.UserAnswer)
+                count++;
+        }
+
+        double value = ((double)count / test.Count) * 100.0;
+
+        Mark mark = new(value, time);
+
+        test.AddStatistic(user, mark);
+
+        AddTest(test);
+    }
+
+    public void Reset()
+    {
+        var test = deser[_fileExtension](_filePath) as Test;
+        test.Reset();
+        AddTest(test);
     }
     #endregion
 
@@ -252,21 +277,33 @@ public class Interaction
         if(IsIndexValid(index, question.Answers))
             question.Answers.RemoveAt(index);
         else
-            throw wrongAnswer;
+            throw new AnswerException(index);
     }
     static void SetRightAnswer(ref Question question, int index)
     {
         if(IsIndexValid(index, question.Answers))
             question.Answers.RightAnswer = index;
         else
-            throw wrongAnswer;
+            throw new AnswerException(index);
     }
     static void ChangeAnswer(ref Question question, int index, string answer)
     {
         if(IsIndexValid(index, question.Answers))
             question.Answers[index] = answer;
         else
-            throw wrongAnswer;
+            throw new AnswerException(index);
+    }
+    public void ReserRightAnswer(int questionIndex)
+    {
+        var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
+
+        if(IsIndexValid(questionIndex, test.Questions))
+        {
+            test[questionIndex].RightAnswer = null;
+            AddTest(test);
+        }
+        else
+            throw new QuestionException(questionIndex);
     }
     #endregion
 
@@ -283,25 +320,6 @@ public class Interaction
             throw new UserException(nameof(lastName));
 
         return new User(firstName, lastName);
-    }
-
-    public void GetPersentOfRightAnswers(Test test, DateTime time, User user)
-    {
-        int count = 0;
-
-        foreach(Question question in test.Questions)
-        {
-            if(question.RightAnswer == question.UserAnswer)
-                count++;
-        }
-
-        double value = ((double)count / test.Count) * 100.0;
-
-        Mark mark = new(value, time);
-
-        test.AddStatistic(user, mark);
-
-        AddTest(test);
     }
 
     public string? CheckForRightAnswers()
@@ -328,18 +346,11 @@ public class Interaction
 
         for(int i = 0; i < test.Questions.Count; i++)
         {
-            if(!test.Questions[i].CheckForRightAnswers())
+            if(!test.Questions[i].CheckForRightAnswer())
             {
                 answers.Add(i);
             }
         }
         return answers;
-    }
-
-    public void Reset()
-    {
-        var test = deser[_fileExtension](_filePath) as Test;
-        test.Reset();
-        AddTest(test);
     }
 }
