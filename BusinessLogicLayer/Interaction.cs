@@ -38,7 +38,7 @@ public class Interaction
         {".json", (graph, filePath) => new JSONProvider(typeof(Test)).Serialize(graph, filePath) }
     };
 
-    static readonly Regex validQuestion = new(@"^[A-Z a-z1-9,+\-:*\\|/A-Z]+\?$");
+    static readonly Regex validQuestion = new(@"^[A-Z]{1}[ a-z1-9,+\-:*\\|/A-Z]+\?$");
     #endregion
 
     #region Ctors
@@ -252,21 +252,33 @@ public class Interaction
         if(IsIndexValid(index, question.Answers))
             question.Answers.RemoveAt(index);
         else
-            throw wrongAnswer;
+            throw new AnswerException(index);
     }
     static void SetRightAnswer(ref Question question, int index)
     {
         if(IsIndexValid(index, question.Answers))
             question.Answers.RightAnswer = index;
         else
-            throw wrongAnswer;
+            throw new AnswerException(index);
     }
     static void ChangeAnswer(ref Question question, int index, string answer)
     {
         if(IsIndexValid(index, question.Answers))
             question.Answers[index] = answer;
         else
-            throw wrongAnswer;
+            throw new AnswerException(index);
+    }
+    public void ReserRightAnswer(int questionIndex)
+    {
+        var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
+
+        if(IsIndexValid(questionIndex, test.Questions))
+        {
+            test[questionIndex].RightAnswer = null;
+            AddTest(test);
+        }
+        else
+            throw new QuestionException(questionIndex);
     }
     #endregion
 
@@ -287,6 +299,7 @@ public class Interaction
 
     public void GetPersentOfRightAnswers(Test test, DateTime time, User user)
     {
+        AddTest(test);
         int count = 0;
 
         foreach(Question question in test.Questions)

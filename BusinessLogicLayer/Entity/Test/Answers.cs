@@ -37,7 +37,7 @@ public class Answers : List<string>, IFormattable
         int index = 1;
         foreach(string answer in this)
         {
-            res += $"\t{index}" + $") {answer};";
+            res += $"{index})" + $" {answer};";
             switch(format.ToUpperInvariant())
             {
                 case answerFormat:
@@ -60,6 +60,7 @@ public class Answers : List<string>, IFormattable
                 break;
 
             }
+            res += "  ";
             index++;
         }
         return res;

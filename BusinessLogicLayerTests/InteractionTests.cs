@@ -79,6 +79,7 @@ public class InteractionTests
     [DataRow("How are you")]
     [DataRow("1ow are you!")]
     [DataRow("how are you!")]
+    [DataRow("1How are you?")]
     public void IsQuestionValid_Fail(string questionS)
     {
         //arrange
