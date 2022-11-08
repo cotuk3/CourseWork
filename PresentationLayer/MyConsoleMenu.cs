@@ -833,7 +833,7 @@ public class MyConsoleMenu : ConsoleMenu
         if(!AskForFilePath(ref inter))
             return;
 
-        inter.Reset();
+        inter.ResetUserAnswers();
         Console.Clear();
 
         Test test;
@@ -929,7 +929,7 @@ public class MyConsoleMenu : ConsoleMenu
             questionIndex++;
         }
 
-        inter.GetPersentOfRightAnswers(test, DateTime.Now, user);
+        inter.CalculatePersentOfRightAnswers(test, DateTime.Now, user);
 
         ShowTest(true, "C");
 

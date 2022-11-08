@@ -40,10 +40,10 @@ public class Test : IFormattable
     /// <summary>
     /// resets user answers
     /// </summary>
-    public void Reset()
+    public void ResetUserAnswers()
     {
         foreach(var question in _questions)
-            question.Reset();
+            question.ResetUserAnswer();
     } 
     #endregion
 
@@ -91,7 +91,7 @@ public class Test : IFormattable
             {
                 for(int i = 0; i < Questions.Count; i++)
                 {
-                    if(Questions[i] != test.Questions[i])
+                    if(!Questions[i].Equals(test.Questions[i]))
                         return false;
                 }
                 return true;

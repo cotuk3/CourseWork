@@ -58,7 +58,7 @@ public class Question
     {
         _answers.Add(answer);
     }
-    public void Reset()
+    public void ResetUserAnswer()
     {
         UserAnswer = null;
     }
