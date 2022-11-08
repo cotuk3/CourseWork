@@ -44,7 +44,7 @@ public class Test : IFormattable
     {
         foreach(var question in _questions)
             question.Reset();
-    }
+    } 
     #endregion
 
     #region Statistic
