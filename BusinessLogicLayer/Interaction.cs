@@ -37,7 +37,7 @@ public class Interaction
         {".json", (graph, filePath) => new JSONProvider(typeof(Test)).Serialize(graph, filePath) }
     };
 
-    static readonly Regex validQuestion = new(@"^[A-Z]{1}[ a-z1-9,+\-:*\\|/A-Z]+\?$");
+    static readonly Regex validQuestion = new(@"^[A-Z]{1}[ \w\W +\-:*\\|/^]+\?$");
     #endregion
 
     #region Ctors

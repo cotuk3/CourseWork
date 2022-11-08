@@ -30,7 +30,7 @@ public class MyConsoleMenu : ConsoleMenu
         mainMenu.Add("/cls", () => Console.Clear());
         mainMenu.Add("/end", () =>
 
-        { Console.WriteLine("Bye, have a good time!"); });
+        { Console.Clear(); Console.WriteLine("Bye, have a good time!"); });
 
         changeMenu.Add("/info", () => ChangeInfo());
         changeMenu.Add("/question", () => StartChangingQuestion());
@@ -460,7 +460,8 @@ public class MyConsoleMenu : ConsoleMenu
         {
             Console.Clear();
 
-            Console.WriteLine("***** Add Question *****");
+            Console.WriteLine("***** Add Question *****" +
+                $"\nfile: {FilePath}\n");
 
             //if we add first question in test do not show all questions
             if(inter.Count != -1)
@@ -505,7 +506,8 @@ public class MyConsoleMenu : ConsoleMenu
 
             Console.Clear();
 
-            Console.WriteLine("***** Delete Question *****");
+            Console.WriteLine("***** Delete Question *****" +
+                $"\nfile: {FilePath}\n");
             ShowQuestions(true);
             Console.Write("Enter index of question which you want to delete" +
                 "\nor /return to stop: ");
@@ -553,7 +555,9 @@ public class MyConsoleMenu : ConsoleMenu
 
             Console.Clear();
 
-            Console.WriteLine("***** Change Question *****");
+            Console.WriteLine("***** Change Question *****" +
+                $"\nfile: {FilePath}\n");
+
             ShowQuestions(true);
 
             Console.Write("Enter index of question which you want to change" +
@@ -617,7 +621,9 @@ public class MyConsoleMenu : ConsoleMenu
             if(question.Answers.Count < Answers.maxCapacity)
             {
                 Console.Clear();
-                Console.WriteLine("***** Add Answer *****");
+                Console.WriteLine("***** Add Answer *****" +
+                $"\nfile: {FilePath}\n");
+
                 ShowQuestion(test, questionIndex);
                 Console.Write("Enter your answer" +
                     "\nor /return to stop: ");
@@ -720,7 +726,9 @@ public class MyConsoleMenu : ConsoleMenu
         }
 
         Console.Clear();
-        Console.WriteLine("***** Set Right Answer *****");
+        Console.WriteLine("***** Set Right Answer *****" +
+            $"\nfile: {FilePath}\n");
+
         ShowQuestion(Test, questionIndex, "A");
         Console.Write($"Please enter right answer (1-{answers.Count})\n" +
                 $"or /return to stop: ");
@@ -760,6 +768,7 @@ public class MyConsoleMenu : ConsoleMenu
         {
             Console.Clear();
             Console.WriteLine(info);
+            Console.WriteLine($"file: {FilePath}\n");
             ShowQuestion(Test, questionIndex);
             Console.Write("Enter index of answer" +
                 "\nor /return to stop: ");
@@ -952,6 +961,7 @@ public class MyConsoleMenu : ConsoleMenu
                     switch(number)
                     {
                         case 1:
+                        Console.Clear();
                         ShowStatistic(true);
                         break;
                         case 2:
@@ -999,22 +1009,14 @@ public class MyConsoleMenu : ConsoleMenu
     private void GetStatsByUser()
     {
         Statistic stats;
-        while(true)
-        {
-            var user = AskUserData();
-            if(user is null)
-                return;
-            try
-            {
-                stats = Test.GetStatisticByUser(user);
-                break;
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                Console.ReadKey();
-            }
-        }
+
+        Console.Clear();
+        var user = AskUserData();
+        if(user is null)
+            return;
+
+        stats = Test.GetStatisticByUser(user);
+
         ShowStatistic(true, stats);
     }
     private void GetStatsByDate()
