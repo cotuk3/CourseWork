@@ -1,4 +1,5 @@
-﻿using BusinessLogicLayer.Entity.Test;
+﻿using BusinessLogicLayer.Entity.Stats;
+using BusinessLogicLayer.Entity.Test;
 using BusinessLogicLayer.Exceptions;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System.Diagnostics;
@@ -35,7 +36,7 @@ public class InteractionTests
         question1 = new Question("What is number of letter A in alphabet?") { Answers = answers1 };
         question2 = new Question("What is lover case letter of D?") { Answers = answers2 };
 
-        test = new() { Questions = { question, question1, question2 } };
+        test = Interaction.DefTest;
         inter = new("file.xml");
         //inter.AddTest(test);
     }
@@ -49,7 +50,7 @@ public class InteractionTests
     [TestMethod()]
     public void InteractionTest()
     {
-
+        inter = new();
     }
 
     [TestMethod()]
@@ -175,7 +176,7 @@ public class InteractionTests
         var actual = inter.GetTest();
 
 
-        Assert.AreEqual(expected.ToString(), actual.ToString());
+        Assert.AreEqual(expected, actual);
     }
 
     [TestMethod()]
@@ -190,7 +191,7 @@ public class InteractionTests
         var actual = inter.GetTest();
 
 
-        //Assert.AreEqual(expected, actual, actual.ToString());
+        //Assert.AreEqual(expected, actual, actual);
     }
 
     [TestMethod()]
@@ -209,7 +210,7 @@ public class InteractionTests
         inter = new("file2.xml");
         var actual = inter.GetTest();
 
-        //Assert.AreEqual(expected, actual, actual.ToString());
+        //Assert.AreEqual(expected, actual, actual);
     }
     #endregion
 
@@ -228,7 +229,7 @@ public class InteractionTests
         var actual = inter.GetTest();
 
         //arrange
-        Assert.AreEqual(expected.ToString(), actual.ToString());
+        Assert.AreEqual(expected, actual);
     }
 
     [TestMethod()]
@@ -252,7 +253,7 @@ public class InteractionTests
         var actual = inter.GetTest();
 
         //assert
-        Assert.AreEqual(expected.ToString(), actual.ToString());
+        Assert.AreEqual(expected, actual);
     }
 
     [ExpectedException(typeof(QuestionException))]
@@ -298,7 +299,7 @@ public class InteractionTests
         var actual = inter.GetTest();
 
         //assert
-        Assert.AreEqual(expected.ToString(), actual.ToString());
+        Assert.AreEqual(expected, actual);
     }
 
     [TestMethod()]
@@ -332,7 +333,7 @@ public class InteractionTests
         var actual = Interaction.CreateQuestion("How are you?");
 
         //assert
-        Assert.AreEqual(expected, actual, actual.ToString());
+        Assert.AreEqual(expected, actual, actual);
     }
 
     [TestMethod()]
@@ -367,7 +368,7 @@ public class InteractionTests
         var actual = inter.GetTest();
 
         //assert
-        Assert.AreEqual(expected.ToString(), actual.ToString());
+        Assert.AreEqual(expected, actual);
     }
 
     [TestMethod()]
@@ -420,7 +421,7 @@ public class InteractionTests
         var actual = inter.GetTest();
 
         //assert
-        Assert.AreEqual(expected.ToString(), actual.ToString());
+        Assert.AreEqual(expected, actual);
     }
 
     [ExpectedException(typeof(QuestionException))]
@@ -505,7 +506,7 @@ public class InteractionTests
         var actual = inter.GetTest();
 
         //assert
-        Assert.AreEqual(expected.ToString(), actual.ToString());
+        Assert.AreEqual(expected, actual);
     }
 
     [ExpectedException(typeof(QuestionException))]
@@ -527,6 +528,242 @@ public class InteractionTests
     }
 
     #endregion
+
+    #region Count
+    [TestMethod()]
+    public void Count_3_Success()
+    {
+        //arrange
+        int expected = test.Count;
+
+        //act
+        inter.AddTest(test);
+        int actual = inter.Count;
+
+        //assert
+        Assert.AreEqual(expected, actual);
+    }
+
+    [TestMethod()]
+    public void Count_Negative1_Success()
+    {
+        //arrange
+        int expected = -1;
+
+        //act
+        int actual = inter.Count;
+
+        //assert
+        Assert.AreEqual(expected, actual);
+    }
+    #endregion
+
+    #region FilePath
+    [TestMethod]
+    [ExpectedException(typeof(ArgumentException))]
+    public void SetFilePath_WrongExtension_Fail()
+    {
+        //arrange 
+        string filePath = "file.jpg";
+
+        //act
+        inter.FilePath = filePath;
+
+    }
+
+    [TestMethod]
+    public void GetFilePath_Success()
+    {
+        //arrange 
+        string expected = "file.xml";
+
+        //act
+        string actual = inter.FilePath;
+
+        //assert
+        Assert.AreEqual(expected, actual);
+
+    }
+    #endregion
+
+    #region ResetRightAnswer
+    [TestMethod()]
+    public void ResetRightAnswer_Success()
+    {
+        //act
+        inter.AddTest(test);
+        inter.ReserRightAnswer(0);
+        var question = inter.GetTest()[0];
+        var rightAnswer = question.RightAnswer;
+
+        Assert.IsNull(rightAnswer);
+
+    }
+
+    [TestMethod()]
+    [ExpectedException(typeof(QuestionException))]
+    public void ResetRightAnswer_WrongQuestionIndex_Fail()
+    {
+        //act
+        inter.AddTest(test);
+        inter.ReserRightAnswer(10);
+    }
+    #endregion
+
+    #region CreateUser
+    [TestMethod()]
+    public void CreateUser_Success()
+    {
+        //arrange
+        string firstName = "Bohdan", lastName = "Liashenko";
+        User expected = new(firstName, lastName);
+
+        //act
+        User actual = Interaction.CreateUser(firstName, lastName);
+
+        //assert
+        Assert.AreEqual(expected, actual);
+    }
+
+    [TestMethod()]
+    [ExpectedException(typeof(UserException))]
+    public void CreateUser_WrongNameandLastName_Fail()
+    {
+        //arrange
+        string firstName = "bohdan", lastName = "1Liashenko";
+        //act
+        User actual = Interaction.CreateUser(firstName, lastName);
+    }
+
+    [TestMethod()]
+    [ExpectedException(typeof(UserException))]
+    public void CreateUser_WrongName_Fail()
+    {
+        //arrange
+        string firstName = "Bohdan d", lastName = "Liashenko";
+        //act
+        User actual = Interaction.CreateUser(firstName, lastName);
+    }
+
+    [TestMethod()]
+    [ExpectedException(typeof(UserException))]
+    public void CreateUser_WrongLastName_Fail()
+    {
+        //arrange
+        string firstName = "Bohdan", lastName = "Liashenko1";
+        //act
+        User actual = Interaction.CreateUser(firstName, lastName);
+    }
+
+    #endregion
+
+    #region GetNotExistingRightAnswers
+    [TestMethod()]
+    public void GetNotExistingRightAnswers_None_Success()
+    {
+        //arrange
+        int expected = 0;
+
+        //act
+        inter.AddTest(test);
+        var list = inter.GetNotExistingRightAnswers();
+        int actual = list.Count;
+
+        //assert
+        Assert.AreEqual(expected, actual);
+    }
+
+    [TestMethod()]
+    public void GetNotExistingRightAnswers_All_Success()
+    {
+        //arrange
+        int expected = 3;
+
+        //act
+        inter.AddTest(test);
+        for(int i = 0; i < test.Count; i++)
+            inter.ReserRightAnswer(i);
+
+        var list = inter.GetNotExistingRightAnswers();
+        int actual = list.Count;
+
+        //assert
+        Assert.AreEqual(expected, actual);
+    }
+    #endregion
+
+    #region CheckForRightAnswers
+    [TestMethod()]
+    public void CheckForRightAnswers_Null_Success()
+    {
+        //act
+        inter.AddTest(test);
+        string actual = inter.CheckForRightAnswers();
+        //assert
+        Assert.IsNull(actual);
+    }
+
+    public void CheckForRightAnswers_NotNull_Success()
+    {
+        //act
+        inter.AddTest(test);
+        for(int i = 0; i < test.Count; i++)
+            inter.ReserRightAnswer(i);
+
+        string actual = inter.CheckForRightAnswers();
+        //assert
+        Assert.IsNotNull(actual);
+    }
+
+    #endregion
+
+    [TestMethod()]
+    public void ResetUserAnswers()
+    {
+        //arrange
+        int?[] expected = { null, null, null };
+
+        //act
+        test[0].UserAnswer = 2;
+        test[1].UserAnswer = 3;
+        test[2].UserAnswer = 1;
+        inter.AddTest(test);
+        inter.ResetUserAnswers();
+
+        int?[] actual = new int?[3];
+        int index = 0;
+        test = inter.GetTest();
+        foreach(var q in test.Questions)
+        {
+            actual[index++] = q.UserAnswer; 
+        }
+        //assert
+        CollectionAssert.AreEqual(expected, actual);
+
+
+    }
+
+    [TestMethod()]
+    public void CalculatePersentOfRightAnswers_Success()
+    {
+        //arrange
+        DateTime time = new(2022, 11, 8);
+        User user = new("Bohdan", "Liashenko");
+        test[0].UserAnswer = 2;
+        test[1].UserAnswer = 0;
+        test[2].UserAnswer = 1;
+        Statistic stats = new();
+        stats.Add(user, new Mark(100, time));
+        string expected = stats[0];
+
+        //act
+        inter.AddTest(test);
+        inter.CalculatePersentOfRightAnswers(test, time, user);
+        string actual = inter.GetTest().GetLastStatistic();
+
+        //assert
+        Assert.AreEqual(expected, actual);
+    }
 
     [TestMethod()]
     public void Clear_Success()

@@ -125,7 +125,7 @@ public class Interaction
             throw new FileNotFoundException("File not found!");
         }
     }
-    public void GetPersentOfRightAnswers(Test test, DateTime time, User user)
+    public void CalculatePersentOfRightAnswers(Test test, DateTime time, User user)
     {
         AddTest(test);
         int count = 0;
@@ -144,11 +144,10 @@ public class Interaction
 
         AddTest(test);
     }
-
-    public void Reset()
+    public void ResetUserAnswers()
     {
         var test = deser[_fileExtension](_filePath) as Test;
-        test.Reset();
+        test.ResetUserAnswers();
         AddTest(test);
     }
     #endregion
@@ -327,9 +326,8 @@ public class Interaction
         List<int> answers = GetNotExistingRightAnswers();
 
         string res = null;
-        if(answers.Count == 0)
-            return res;
-        else
+
+        if(answers.Count != 0)
         {
             res = "Questions: ";
             foreach(int i in answers)
