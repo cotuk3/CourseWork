@@ -1042,7 +1042,8 @@ public class MyConsoleMenu : ConsoleMenu
     {
     loop:
         Console.Clear();
-        Console.Write("Enter file path:");
+        Console.Write("Enter file path or /return to end" +
+            "\n(file can be: dat, xml or json): ");
 
         string? filePath = Console.ReadLine();
         if(filePath == "/return" || filePath == "/end")
