@@ -222,7 +222,7 @@ var assemblies = [
     "name": "BusinessLogicLayer",
     "classes": [
       { "name": "BusinessLogicLayer.Entity.Stats.Mark", "rp": "BusinessLogicLayer_Mark.html", "cl": 10, "ucl": 13, "cal": 23, "tl": 43, "ct": "LineCoverage", "cbm": "-", "cb": 0, "tb": 4, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [] },
-      { "name": "BusinessLogicLayer.Entity.Stats.Statistic", "rp": "BusinessLogicLayer_Statistic.html", "cl": 4, "ucl": 38, "cal": 42, "tl": 62, "ct": "LineCoverage", "cbm": "-", "cb": 0, "tb": 12, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [] },
+      { "name": "BusinessLogicLayer.Entity.Stats.Statistic", "rp": "BusinessLogicLayer_Statistic.html", "cl": 4, "ucl": 32, "cal": 36, "tl": 56, "ct": "LineCoverage", "cbm": "-", "cb": 0, "tb": 8, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [] },
       { "name": "BusinessLogicLayer.Entity.Stats.User", "rp": "BusinessLogicLayer_User.html", "cl": 16, "ucl": 7, "cal": 23, "tl": 41, "ct": "LineCoverage", "cbm": "-", "cb": 2, "tb": 4, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [] },
       { "name": "BusinessLogicLayer.Entity.Test.Answers", "rp": "BusinessLogicLayer_Answers.html", "cl": 2, "ucl": 33, "cal": 35, "tl": 69, "ct": "LineCoverage", "cbm": "-", "cb": 0, "tb": 22, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [] },
       { "name": "BusinessLogicLayer.Entity.Test.Question", "rp": "BusinessLogicLayer_Question.html", "cl": 34, "ucl": 7, "cal": 41, "tl": 89, "ct": "LineCoverage", "cbm": "-", "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [] },
@@ -230,7 +230,7 @@ var assemblies = [
       { "name": "BusinessLogicLayer.Exceptions.AnswerException", "rp": "BusinessLogicLayer_AnswerException.html", "cl": 6, "ucl": 9, "cal": 15, "tl": 28, "ct": "LineCoverage", "cbm": "-", "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [] },
       { "name": "BusinessLogicLayer.Exceptions.QuestionException", "rp": "BusinessLogicLayer_QuestionException.html", "cl": 6, "ucl": 9, "cal": 15, "tl": 27, "ct": "LineCoverage", "cbm": "-", "cb": 1, "tb": 2, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [] },
       { "name": "BusinessLogicLayer.Exceptions.UserException", "rp": "BusinessLogicLayer_UserException.html", "cl": 6, "ucl": 9, "cal": 15, "tl": 27, "ct": "LineCoverage", "cbm": "-", "cb": 0, "tb": 0, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [] },
-      { "name": "BusinessLogicLayer.Interaction", "rp": "BusinessLogicLayer_Interaction.html", "cl": 221, "ucl": 11, "cal": 232, "tl": 354, "ct": "LineCoverage", "cbm": "-", "cb": 62, "tb": 66, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [] },
+      { "name": "BusinessLogicLayer.Interaction", "rp": "BusinessLogicLayer_Interaction.html", "cl": 227, "ucl": 5, "cal": 232, "tl": 354, "ct": "LineCoverage", "cbm": "-", "cb": 65, "tb": 66, "cm": 0, "tm": 0, "lch": [], "bch": [], "mch": [], "hc": [] },
     ]},
   {
     "name": "DataAccessLayer",
