@@ -24,10 +24,7 @@ public class Statistic : List<string>
                         select s;
 
         Statistic userStats = new();
-        foreach(var stat in listStats)
-        {
-            userStats.Add(stat);
-        }
+        userStats.AddRange(listStats);
 
         //if we didnt find any entry throw exception
         return userStats.Count != 0 ? userStats : throw new Exception("No entry for this user!");
@@ -41,10 +38,7 @@ public class Statistic : List<string>
                         select s;
 
         Statistic dateStats = new();
-        foreach(var stat in listStats)
-        {
-            dateStats.Add(stat);
-        }
+        dateStats.AddRange(listStats);
 
         //if we didnt find any entry throw exception
         return dateStats.Count != 0 ? dateStats : throw new Exception("No entry for this date!");
