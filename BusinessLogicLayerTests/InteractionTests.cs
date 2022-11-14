@@ -571,7 +571,7 @@ public class InteractionTests
     {
         //act
         inter.AddTest(test);
-        inter.ReserRightAnswer(0);
+        inter.ResetRightAnswer(0);
         var question = inter.GetTest()[0];
         var rightAnswer = question.RightAnswer;
 
@@ -587,7 +587,7 @@ public class InteractionTests
     {
         //act
         inter.AddTest(test);
-        inter.ReserRightAnswer(questionIndex);
+        inter.ResetRightAnswer(questionIndex);
     }
     #endregion
 
@@ -665,7 +665,7 @@ public class InteractionTests
         //act
         inter.AddTest(test);
         for(int i = 0; i < test.Count; i++)
-            inter.ReserRightAnswer(i);
+            inter.ResetRightAnswer(i);
 
         var list = inter.GetNotExistingRightAnswers();
         int actual = list.Count;
@@ -692,7 +692,7 @@ public class InteractionTests
         //act
         inter.AddTest(test);
         for(int i = 0; i < test.Count; i++)
-            inter.ReserRightAnswer(i);
+            inter.ResetRightAnswer(i);
 
         string actual = inter.CheckForRightAnswers();
         Debug.WriteLine(actual);
@@ -700,6 +700,53 @@ public class InteractionTests
         //assert
         Assert.IsNotNull(actual);
     }
+    #endregion
+
+    #region SetUserAnswer
+    [TestMethod()]
+    public void SetUserAnswer_0_0_Success()
+    {
+        //arrange
+        int answerIndex = 0, questionIndex = 0;
+        //act
+        inter.AddTest(test);
+        inter.SetUserAnswer(questionIndex, answerIndex);
+        var actual = inter.GetTest()[questionIndex].UserAnswer;
+        //assert
+        Assert.AreEqual(answerIndex, actual);
+    }
+
+    [TestMethod()]
+    [ExpectedException(typeof(QuestionException))]
+    [DataRow(10)]
+    [DataRow(-1)]
+    [DataRow(3)]
+    public void SetUserAnswer_WrongQuestionIndex_Fail(int questionIndex)
+    {
+        //arrange
+        int answerIndex = 0;
+        //act
+        inter.AddTest(test);
+        inter.SetUserAnswer(questionIndex, answerIndex);
+    }
+
+    [TestMethod()]
+    [ExpectedException(typeof(AnswerException))]
+    [DataRow(10)]
+    [DataRow(-1)]
+    [DataRow(4)]
+    public void SetUserAnswer_WrongAnswerIndex_Fail(int answerIndex)
+    {
+        //arrange
+        int questionIndex = 0;
+        //act
+        inter.AddTest(test);
+        inter.SetUserAnswer(questionIndex, answerIndex);
+        var actual = inter.GetTest()[questionIndex].UserAnswer;
+        //assert
+        Assert.AreEqual(answerIndex, actual);
+    }
+
     #endregion
 
     [TestMethod()]
