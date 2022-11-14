@@ -125,10 +125,10 @@ public class Interaction
             throw new FileNotFoundException("File not found!");
         }
     }
-    public void CalculatePersentOfRightAnswers(Test test, DateTime time, User user)
+    public void CalculatePersentOfRightAnswers(DateTime time, User user)
     {
-        AddTest(test);
         int count = 0;
+        Test test = GetTest();
 
         foreach(Question question in test.Questions)
         {
@@ -198,6 +198,8 @@ public class Interaction
     #endregion
 
     #region Answers
+
+    #region AddAnswer 
     public void AddAnswer(int questionIndex, string answer)
     {
         var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
@@ -214,6 +216,16 @@ public class Interaction
         else
             throw new QuestionException(questionIndex);
     }
+    static void AddAnswer(ref Question question, string answer)
+    {
+        if(question.Answers.Count < Answers.maxCapacity)
+            question.Add(answer);
+        else
+            throw wrongAnswer;
+    }
+    #endregion
+
+    #region DeleteAnswer
     public void DeleteAnswer(int questionIndex, int answerIndex)
     {
         var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
@@ -230,6 +242,16 @@ public class Interaction
         else
             throw new QuestionException(questionIndex);
     }
+    static void DeleteAnswer(ref Question question, int index)
+    {
+        if(IsIndexValid(index, question.Answers))
+            question.Answers.RemoveAt(index);
+        else
+            throw new AnswerException(index);
+    }
+    #endregion
+
+    #region SetRightAnswer
     public void SetRightAnswer(int questionIndex, int answerIndex)
     {
         var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
@@ -247,6 +269,43 @@ public class Interaction
         else
             throw new QuestionException(questionIndex);
     }
+    static void SetRightAnswer(ref Question question, int index)
+    {
+        if(IsIndexValid(index, question.Answers))
+            question.Answers.RightAnswer = index;
+        else
+            throw new AnswerException(index);
+    }
+    #endregion
+
+    #region SetUserAnswer
+    public void SetUserAnswer(int questionIndex, int answerIndex)
+    {
+        var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
+
+        if(IsIndexValid(questionIndex, test.Questions))
+        {
+            Question question = test[questionIndex];
+
+            SetUserAnswer(ref question, answerIndex);
+
+            test[questionIndex] = question;
+
+            AddTest(test);
+        }
+        else
+            throw new QuestionException(questionIndex);
+    }
+    static void SetUserAnswer(ref Question question, int index)
+    {
+        if(IsIndexValid(index, question.Answers))
+            question.Answers.UserAnswer = index;
+        else
+            throw new AnswerException(index);
+    }
+    #endregion
+
+    #region ChangeAnswer
     public void ChangeAnswer(int questionIndex, int answerIndex, string answer)
     {
         var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
@@ -263,28 +322,6 @@ public class Interaction
         else
             throw new QuestionException(questionIndex);
     }
-
-    static void AddAnswer(ref Question question, string answer)
-    {
-        if(question.Answers.Count < Answers.maxCapacity)
-            question.Add(answer);
-        else
-            throw wrongAnswer;
-    }
-    static void DeleteAnswer(ref Question question, int index)
-    {
-        if(IsIndexValid(index, question.Answers))
-            question.Answers.RemoveAt(index);
-        else
-            throw new AnswerException(index);
-    }
-    static void SetRightAnswer(ref Question question, int index)
-    {
-        if(IsIndexValid(index, question.Answers))
-            question.Answers.RightAnswer = index;
-        else
-            throw new AnswerException(index);
-    }
     static void ChangeAnswer(ref Question question, int index, string answer)
     {
         if(IsIndexValid(index, question.Answers))
@@ -292,7 +329,9 @@ public class Interaction
         else
             throw new AnswerException(index);
     }
-    public void ReserRightAnswer(int questionIndex)
+    #endregion
+
+    public void ResetRightAnswer(int questionIndex)
     {
         var test = deser[_fileExtension](_filePath) as Test; // never null because before this method always GetTest() being called
 
@@ -321,6 +360,10 @@ public class Interaction
         return new User(firstName, lastName);
     }
 
+    /// <summary>
+    /// if test has question without right answers returns their indexes 
+    /// </summary>
+    /// <returns></returns>
     public string? CheckForRightAnswers()
     {
         List<int> answers = GetNotExistingRightAnswers();
