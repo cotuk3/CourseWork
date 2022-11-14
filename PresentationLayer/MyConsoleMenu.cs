@@ -4,6 +4,7 @@ using BusinessLogicLayer.Entity.Test;
 using BusinessLogicLayer.Exceptions;
 using ConsoleMenuBase;
 using System.Collections;
+using System.Globalization;
 
 namespace PresentationLayer;
 
@@ -688,24 +689,24 @@ public class MyConsoleMenu : ConsoleMenu
     private void ChangeAnswer(int questionIndex)
     {
     //enter index of answer while it is not valid
-    loop1:
+    changeAnswer:
         var answers = Test[questionIndex].Answers;
         int answerIndex = 0;
 
         if(!AskAnswerIndex("***** Change Answer *****", ref answerIndex, questionIndex))
-            goto set;
+            goto setRightAnswer;
 
         if(!Interaction.IsIndexValid(answerIndex, answers))
         {
             Console.WriteLine(new AnswerException(answerIndex).Message);
             Console.ReadKey();
-            goto loop1;
+            goto changeAnswer;
         }
 
         Console.Write("Enter new answer: ");
         inter.ChangeAnswer(questionIndex, answerIndex, Console.ReadLine());
 
-    set:
+    setRightAnswer:
         SetRightAnswer(questionIndex);
     }
 
@@ -719,9 +720,11 @@ public class MyConsoleMenu : ConsoleMenu
     loop:
         var question = Test[questionIndex];
         var answers = question.Answers;
+
+        //if user has deleted all answers set right answer to null
         if(answers.Count <= 0)
         {
-            inter.ReserRightAnswer(questionIndex);
+            inter.ResetRightAnswer(questionIndex);
             return;
         }
 
@@ -736,13 +739,16 @@ public class MyConsoleMenu : ConsoleMenu
         string? rightAnswer = Console.ReadLine();
         if(rightAnswer == "/return" || rightAnswer == "/end")
             return;
+
         if(!int.TryParse(rightAnswer, out int rightAnswerIndex))
         {
             Console.WriteLine(new AnswerException(rightAnswer).Message);
             Console.ReadKey();
             goto loop;
         }
+
         --rightAnswerIndex;
+
         try
         {
             inter.SetRightAnswer(questionIndex, rightAnswerIndex);
@@ -783,10 +789,7 @@ public class MyConsoleMenu : ConsoleMenu
                 Console.ReadKey();
             }
             else
-            {
                 break;
-            }
-
         } while(true);
 
         answerIndex--;
@@ -814,7 +817,7 @@ public class MyConsoleMenu : ConsoleMenu
             try
             {
                 user = Interaction.CreateUser(firstName, lastName);
-                break;
+                return user;
             }
             catch(UserException ex)
             {
@@ -823,7 +826,6 @@ public class MyConsoleMenu : ConsoleMenu
                 Console.ReadKey();
             }
         } while(true);
-        return user;
     }
     private void PassTest()
     {
@@ -848,8 +850,6 @@ public class MyConsoleMenu : ConsoleMenu
             goto loop;
         }
 
-
-
         string? rightAnswers = inter.CheckForRightAnswers();
 
         if(rightAnswers is not null)
@@ -859,14 +859,15 @@ public class MyConsoleMenu : ConsoleMenu
             goto loop;
         }
 
-        //ask user name and lastname
+
         User? user = AskUserData();
-        if(user is null)
+        // returns null when user enters /return or /end
+        if(user is null) 
             goto loop;
 
         int questionIndex = 0;
 
-        //answer the questions
+        //answer the questions till user enter /end or /return 
         while(true)
         {
             Console.Clear();
@@ -874,14 +875,12 @@ public class MyConsoleMenu : ConsoleMenu
 
             // if user has answered to the last question return to first question
             if(questionIndex == inter.Count)
-            {
                 questionIndex = 0;
-            }
 
-            //answer the questions till user enter /end or /return 
+            
             string input;
 
-            ShowQuestion(test, questionIndex);
+            ShowQuestion(Test, questionIndex);
 
             Console.Write("Enter\n" + ":");
             input = Console.ReadLine();
@@ -917,19 +916,19 @@ public class MyConsoleMenu : ConsoleMenu
 
             --answerIndex;
 
-            if(answerIndex < 0 || answerIndex > 3)
+            try
             {
-                Console.WriteLine(new AnswerException(answerIndex).Message);
-                Console.ReadKey();
-                continue;
+                inter.SetUserAnswer(questionIndex, answerIndex);
+                questionIndex++;
             }
-
-            test[questionIndex].UserAnswer = answerIndex;
-
-            questionIndex++;
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                Console.ReadKey();
+            }
         }
 
-        inter.CalculatePersentOfRightAnswers(test, DateTime.Now, user);
+        inter.CalculatePersentOfRightAnswers(DateTime.Now, user);
 
         ShowTest(true, "C");
 
@@ -1030,7 +1029,8 @@ public class MyConsoleMenu : ConsoleMenu
             "(date format (date.month.year)\n:");
             date = Console.ReadLine();
 
-        } while(!DateTime.TryParse(date, out time));
+        } while(!DateTime.TryParse(date, new CultureInfo("uk-UA"), DateTimeStyles.None, out time));
+        //because on my PC is USA culture 
 
         var stats = Test.GetStatisticByDate(time);
         ShowStatistic(true, stats);
