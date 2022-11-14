@@ -37,14 +37,11 @@ public class Test : IFormattable
         set => _questions = value;
     }
 
-    /// <summary>
-    /// resets user answers
-    /// </summary>
     public void ResetUserAnswers()
     {
         foreach(var question in _questions)
             question.ResetUserAnswer();
-    } 
+    }
     #endregion
 
     #region Statistic

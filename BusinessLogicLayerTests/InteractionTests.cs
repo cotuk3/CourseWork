@@ -792,7 +792,7 @@ public class InteractionTests
 
         //act
         inter.AddTest(test);
-        inter.CalculatePersentOfRightAnswers(test, time, user);
+        inter.CalculatePersentOfRightAnswers(time, user);
         string actual = inter.GetTest().GetLastStatistic();
 
         //assert
